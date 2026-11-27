@@ -6,11 +6,11 @@ Open the downloaded `index.html` in your browser on a tablet, phone, or computer
 
 ## Playing songs
 
-Search the library by song title or artist. On smaller screens, the menu button opens the library. Expand **Guitar chords** to see six-string chord shapes, including open and muted strings. Use the song controls to transpose or resize the text. The header lets you switch appearance and language. **English** shows songs with English lyrics, while **Čeština** shows the full collection. Both modes use Czech chord names (H and B).
+Search the library by song title or artist. On smaller screens, the menu button opens the library. Expand **Guitar chords** to see six-string chord shapes, including open and muted strings. Open **Other fingerings** for different voicings of the same chord, or **Harmonic variations** for optional changes to try. Suggestions use the displayed key and leave the score as written. Use the song controls to transpose or resize the text. The header lets you switch appearance and language. **English** shows songs with English lyrics, while **Čeština** shows the full collection. Both modes use Czech chord names (H and B).
 
 Use **Sort by** to list titles alphabetically, by the original file timestamp preserved in the downloaded ZIP, or by import time in the app. Date sorts show newest first. Missing dates appear last. Songs from the same import are ordered by title. Edits keep the original addition date.
 
-Select **Play mode** to hide the controls. Scroll vertically or use **Next page** at the bottom right to advance by one visible page of music. Page Up, Page Down and the arrow keys also turn pages. Change the text size with A−/A+ or pinch the score on a touch screen. The reader remembers the zoom for each song on this device. Open **Song settings** to adjust text size, transposition or capo. Changes are saved automatically on this device. Tap the transposition number between − and + to restore the original key.
+Select **Play mode** to hide the controls. Scroll vertically or use **Next page** at the bottom right to advance to the next group of rendered rows. Wrapped chord and lyric rows stay together, and there is room to scroll through expanded tablature. Page Up, Page Down and the arrow keys also turn pages. Change the text size with A−/A+ or pinch the score on a touch screen. The reader remembers the zoom for each song on this device. Open **Song settings** to adjust text size, transposition or capo. Changes are saved automatically on this device. Tap the transposition number between − and + to restore the original key.
 
 Long-press a line, right-click it, or focus it and press Enter to report a missing chord, a misplaced chord, or incorrect lyrics. Reports stay in this browser until you export them together from **Library tools → Export reports**. Send the exported JSON to share your corrections.
 
@@ -18,7 +18,7 @@ The [automatic arrangement checks](./ARRANGEMENT-CHECKS.md) run on every publica
 
 ## Moving song settings between devices
 
-Under **Library tools**, choose **Export song settings**. Copy the downloaded JSON file to your other device and choose **Import song settings** there. This works offline. The backup includes saved capo frets, transpositions and song zoom levels. Import merges settings per song: values in the file take precedence, and other saved values stay in place.
+Under **Library tools**, choose **Export song settings**. Copy the downloaded JSON file to your other device and choose **Import song settings** there. This works offline. The backup includes saved capo frets, transpositions and song zoom levels. Import merges settings per arrangement. Values in the file take precedence, and other saved values stay in place. The app accepts earlier filename-based backups and writes new backups using stable arrangement IDs.
 
 ### Library 10 arrangement review
 
@@ -31,6 +31,27 @@ Open **Library tools** and select **Check for updates** while online. The check 
 ## Building the offline app
 
 Edit the layout and styles in `app/` and the reader behavior in `cteni.js`. Run `python3 tools/build.py` from the repository root to embed the interface, share QR code and library in a single `index.html`. Open that file directly to test it offline.
+
+Use `REPOSITORY_PRIVATE=false python3 tools/build.py` to match the public GitHub release. The build reads the arrangement collection from `ChordPro/*.cho` and the previous metadata and revision history from the checked-in `library.json`. It regenerates `library.json`, `knihovna.js`, `version.json` and the standalone HTML. The library version increases once when the published arrangement data changes, even if several arrangements change together.
+
+Run the regression tests from the repository root. The PDF integration test uses Poppler's `pdftotext`. Install Tesseract with English and Czech language data to convert scanned PDFs.
+
+```sh
+python3 -m unittest discover -s tools -v
+npm ci
+npx playwright install chromium
+npm test
+```
+
+The browser tests open the built HTML directly from disk and exercise mobile, tablet and desktop layouts. The **Validate songbook** workflow runs the same checks on pull requests with read-only repository permissions. The existing publishing workflow builds the downloadable releases from `main`.
+
+### Arrangement IDs and PDF imports
+
+- Every arrangement has a permanent UUID stored in the final `{x-arrangement-id: …}` directive of its ChordPro source. Commit the source for a new arrangement so the build can credit its contributor, then keep the ID added by the build. Move the directive with the file when renaming it, and retain it when correcting the arrangement. When copying a file to create a separate arrangement, remove the copied directive so the build assigns a new ID.
+- The ID connects an arrangement to its previous revision and original import timestamps. A filename-only rename records the old filename as an alias and keeps the revision. Correcting the music or metadata creates a revision. The identity directive stays out of the rendered score and retains the source line numbers used by reports.
+- The app migrates saved capo, transposition and zoom values from current and historical filenames when it first sees the ID. Line reports retain their original filename, line and revision and include the ID when the app can resolve it. Schema 1 library updates still load in earlier readers. Earlier readers use filenames for their own saved settings.
+- `tools/imports.json` records each PDF's digest, the associated arrangement and whether the arrangement is still generated. Keep that record when deleting its ChordPro file so a later build does not reimport the PDF. The build detects manual corrections before replacing a generated arrangement from a changed PDF and lists the PDF for review.
+
 
 ## Adding a song
 

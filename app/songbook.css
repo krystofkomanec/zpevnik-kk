@@ -609,6 +609,36 @@ h1 {
   font: 11px monospace;
   color: var(--muted);
 }
+.chart-group {
+  flex: 0 1 146px;
+  min-width: 0;
+}
+.chart-group:has(> .chart-choice[open]) {
+  flex-basis: 100%;
+}
+.chart-choice {
+  margin: 6px 0;
+}
+.chart-choice summary {
+  width: fit-content;
+  cursor: pointer;
+  font-size: .82rem;
+  padding: 5px 2px;
+}
+.chart-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 4px;
+}
+.chart-options .chart {
+  width: 112px;
+}
+.chart p {
+  margin: 5px 2px 0;
+  color: var(--muted);
+  font-size: .72rem;
+}
 #tools {
   margin: 0 0 8px;
   padding: 8px 0 11px;
@@ -766,10 +796,38 @@ h1 {
 .playing #play-bar,.playing #page-nav {
   flex: none;
 }
+#score-frame {
+  display: contents;
+}
+.playing #score-frame {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.playing #score-frame::before,.playing #score-frame::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  right: var(--score-scrollbar,0px);
+  left: 0;
+  background: var(--paper);
+  pointer-events: none;
+}
+.playing #score-frame::before {
+  top: 0;
+  height: var(--page-top-gap,0px);
+}
+.playing #score-frame::after {
+  bottom: 0;
+  height: var(--page-gap,0px);
+}
 .playing #score {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-anchor: none;
+  scrollbar-gutter: stable;
   max-width: none;
   padding: 8px 16px;
   -webkit-overflow-scrolling: touch;

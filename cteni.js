@@ -6,6 +6,7 @@ function clear(e){while(e.firstChild)e.removeChild(e.firstChild)}
 function get(k,f){try{return localStorage.getItem('zpevnik.'+k)||f}catch(e){return f}}
 function save(k,v){try{localStorage.setItem('zpevnik.'+k,v)}catch(e){}}
 function fold(s){s=s.toLowerCase();return s.normalize?s.normalize('NFD').replace(/[\u0300-\u036f]/g,''):s}
+var noSong={file:'',title:'',artist:'',cho:''};
 var size=Math.min(40,Math.max(14,Number(get('text','21'))||21)),dark=get('dark','0')==='1',current,shift=0;
 var order=el('library-order');
 var savedOrder=get('order','title');
@@ -49,7 +50,7 @@ function translatePage(){
 }
 el('language').onclick=function(){
  english=!english;save('language',english?'en':'cs');translatePage();
- if(!visible(current)){current=songs.filter(visible)[0];loadSongSettings()}
+ if(current===noSong || !visible(current)){current=songs.find(visible)||noSong;loadSongSettings()}
  list();render();
 };
 function theme(){document.body.classList.toggle('dark',dark);el('theme').textContent=dark?'☾':'☀';el('theme').setAttribute('aria-pressed',String(dark));save('dark',dark?'1':'0')}
@@ -60,7 +61,7 @@ try{var previousView=JSON.parse(sessionStorage.getItem('zpevnik.library-view'));
 }catch(ignore){}
 function rememberLibrary(){
  libraryView.query=el('search').value;
- if(current)libraryView.file=current.file;
+ if(current)libraryView.file=songKey(current);
  libraryView.browse=document.body.classList.contains('browse');
  if(el('library').offsetWidth)libraryView.top=el('list').scrollTop;
  if(libraryView.browse)libraryView.page=window.pageYOffset;
@@ -189,17 +190,24 @@ var intervals={'':[0,4,7],m:[0,3,7],maj:[0,4,7],5:[0,7],7:[0,4,7,10],
  add9:[0,2,4,7],madd9:[0,2,3,7],add11:[0,4,5,7],add4:[0,4,5,7],
  '6add9':[0,2,4,7,9],'6add11':[0,4,5,7,9],9:[0,2,4,7,10],m9:[0,2,3,7,10],
  maj9:[0,2,4,7,11],m7b5:[0,3,6,10],'m7#5':[0,3,8,10]};
-var shapeCache=Object.create(null);
-function guitarShape(symbol){
- if(Object.prototype.hasOwnProperty.call(shapeCache,symbol))return shapeCache[symbol];
- var match=/^([A-H](?:is|es|s(?!us)|#|b|♭|♯)?)([^/]*)(?:\/([A-H](?:is|es|s|#|b|♭|♯)?))?$/.exec(symbol);
+var shapeCache=Object.create(null),voicingCache=new Map(),tuning=[40,45,50,55,59,64];
+var chordPattern=/^([A-H](?:is|es|s(?!us)|#|b|♭|♯)?)([^/]*)(?:\/([A-H](?:is|es|s|#|b|♭|♯)?))?$/;
+function chordSpec(symbol){
+ var match=chordPattern.exec(symbol);
  if(!match)return null;
- var quality=match[2].replace(/^(?:min|mi)/,'m').replace(/^\+$/,'aug').replace(/^(4|sus|4sus)$/,'sus4');
+ var quality=match[2].replace(/^(?:min|mi)/,'m').replace(/^\+$/,'aug').replace(/^(4|sus|4sus)$/,'sus4').replace(/^7sus$/,'7sus4');
  var tones=intervals[quality],root=note(match[1],'cz'),bass=match[3]?note(match[3],'cz'):root;
  if(!Array.isArray(tones)||root===null||bass===null)return null;
- var preset=openShapes[match[1]+quality+(match[3]?'/'+match[3]:'')];
- if(preset)return preset.split('').map(function(c){return c==='x'?-1:Number(c)});
- var tuning=[4,9,2,7,11,4],required=tones.map(function(n){return (n+root)%12});
+ return {name:match[1],quality:quality,root:root,bass:bass,slash:match[3],
+  tones:tones.map(function(n){return (n+root)%12})};
+}
+function guitarShape(symbol){
+ if(Object.prototype.hasOwnProperty.call(shapeCache,symbol))return shapeCache[symbol];
+ var spec=chordSpec(symbol);
+ if(!spec)return null;
+ var preset=openShapes[spec.name+spec.quality+(spec.slash?'/'+spec.slash:'')];
+ if(preset)return (shapeCache[symbol]=preset.split('').map(function(c){return c==='x'?-1:Number(c)}));
+ var required=spec.tones,bass=spec.bass;
  var best=null,bestCost=Infinity;
  // Search contiguous strings in a four-fret window; the lowest pitch must be the requested bass.
  for(var start=1;start<=9;start++){
@@ -243,18 +251,150 @@ function guitarDiagram(frets){
  });
  return svg;
 }
+// A barre saves one finger per extra string if the lowest fret can be
+// held across the intervening strings without muting a ringing open note.
+function fingerCount(frets){
+ var pressed=frets.filter(function(fret){return fret>0}),base=Math.min.apply(null,pressed);
+ var span=frets.slice(frets.indexOf(base),frets.lastIndexOf(base)+1);
+ var barre=span.length>1 && !span.includes(0);
+ return {count:pressed.length-(barre?span.filter(function(fret){return fret===base}).length-1:0),barre:barre};
+}
+function guitarVoicings(symbol,spec){
+ if(voicingCache.has(symbol))return voicingCache.get(symbol);
+ var candidates=new Map();
+ for(var start=1;start<=12;start++){
+  for(var first=0;first<=3;first++)visit(first,first,[]);
+ }
+ function visit(first,string,frets){
+  if(frets.length>=3){
+   var pitches=frets.map(function(fret,i){return fret+tuning[first+i]});
+   var bass=Math.min.apply(null,pitches)%12;
+   var fingers=fingerCount(frets),butNotBass=pitches.slice(1);
+   if(fingers.count<=4 && (!spec.slash || bass===spec.bass) &&
+      butNotBass.every(function(pitch){return spec.tones.includes(pitch%12)}) &&
+      spec.tones.every(function(tone){return pitches.some(function(pitch){return pitch%12===tone})})){
+    var shape=Array(6).fill(-1);
+    frets.forEach(function(fret,i){shape[first+i]=fret});
+    var top=Math.max.apply(null,frets),base=top?Math.min.apply(null,frets.filter(function(fret){return fret>0})):0;
+    var cost=(6-frets.length)*1.1+fingers.count*.9+top*.22+(top-base)*.55;
+    var group=bass!==spec.bass?'inversion':frets.includes(0)?'open':fingers.barre?'barre':'higher';
+    var key=shape.join(',');
+    candidates.set(key,{shape:shape,bass:bass,group:group,position:base,cost:cost});
+   }
+  }
+  if(string===6)return;
+  var options=[0,start,start+1,start+2,start+3];
+  options.forEach(function(fret){
+   var tone=(tuning[string]+fret)%12;
+   if(spec.tones.includes(tone) || (string===first && spec.slash && tone===spec.bass)){
+    visit(first,string+1,frets.concat(fret));
+   }
+  });
+ }
+ var sorted=Array.from(candidates.values()).sort(function(a,b){return a.cost-b.cost});
+ voicingCache.set(symbol,sorted);
+ return sorted;
+}
+var czechNotes='C C# D Eb E F F# G Ab A B H'.split(' ');
+function sameChordOptions(symbol,spec,defaultShape){
+ var used=new Set(),options=[],defaultKey=defaultShape?defaultShape.join(','):'';
+ var defaultPosition=defaultShape?Math.min.apply(null,defaultShape.filter(function(fret){return fret>0})):1;
+ guitarVoicings(symbol,spec).forEach(function(option){
+  if(options.length===4 || used.has(option.group) || option.shape.join(',')===defaultKey)return;
+  if(option.group==='higher' && Math.abs(option.position-defaultPosition)<2)return;
+  used.add(option.group);
+  var descriptions={
+   open:t('Doznívající otevřené struny','Ringing open strings'),
+   barre:t('Barré hmat','Barre shape'),
+   higher:t('Jiná poloha na hmatníku','Different neck position'),
+   inversion:t('Obrat · bas ','Inversion · bass ')+czechNotes[option.bass]
+  };
+  options.push({symbol:symbol,shape:option.shape,description:descriptions[option.group]});
+ });
+ return options;
+}
+function likelyScale(symbols){
+ var triads=symbols.map(chordSpec).filter(function(spec){return spec && ['','maj','m'].includes(spec.quality)});
+ if(triads.length<3)return null;
+ var scores=czechNotes.map(function(_,root){
+  var notes=[0,2,4,5,7,9,11].map(function(interval){return (root+interval)%12});
+  var matching=triads.filter(function(spec){return spec.tones.every(function(tone){return notes.includes(tone)})});
+  return {root:root,notes:notes,count:matching.length};
+ }).sort(function(a,b){return b.count-a.count});
+ return scores[0].count>scores[1].count && scores[0].count>=triads.length*.75?scores[0]:null;
+}
+function harmonicOptions(spec,scale){
+ if(spec.slash || !['','maj','m'].includes(spec.quality))return [];
+ var major=spec.quality!=='m',fifth=czechNotes[(spec.root+7)%12];
+ var candidates=major?[
+  ['add9',t('Jasnější zvuk s přidanou nónou','Brighter sound with an added ninth')],
+  ['maj7',t('Jemné napětí velké septimy','Soft major-seventh tension')],
+  ['/'+fifth,t('Jiný bas pro plynulý přechod','Different bass for a smoother transition')],
+  ['6',t('Měkčí zvuk s velkou sextou','Softer sound with a major sixth')],
+  ['sus2',t('Otevřený zvuk bez tercie','Open sound without the third')],
+  ['sus4',t('Průchod s napětím kvarty','Suspended fourth for a passing chord')]
+ ]:[
+  ['m7',t('Měkčí mollový doprovod','Softer minor accompaniment')],
+  ['madd9',t('Moll s doznívající nónou','Minor with a ringing ninth')],
+  ['/'+fifth,t('Jiný bas pro plynulý přechod','Different bass for a smoother transition')]
+ ];
+ if(major && scale){
+  var degree=(spec.root-scale.root+12)%12;
+  var priorities={5:['sus2','maj7','6'],7:['sus4','add9','/'+fifth]}[degree];
+  if(priorities)candidates.sort(function(a,b){
+   var rank=function(entry){var index=priorities.indexOf(entry[0]);return index<0?priorities.length:index};
+   return rank(a)-rank(b);
+  });
+ }
+ var playable=[];
+ candidates.some(function(candidate){
+  var suffix=candidate[0],symbol=spec.name+(suffix[0]==='/'?spec.quality:'')+suffix;
+  var variation=chordSpec(symbol);
+  if(scale && !variation.tones.every(function(tone){return scale.notes.includes(tone)}))return false;
+  if(!scale && suffix==='maj7')return false;
+  var shape=guitarShape(symbol);
+  if(shape)playable.push({symbol:symbol,shape:shape,description:candidate[1]});
+  return playable.length===3;
+ });
+ return playable;
+}
+function chartCard(symbol,shape,description){
+ var card=make('div',undefined,'chart');
+ card.appendChild(make('b',symbol));
+ if(shape){
+  card.appendChild(guitarDiagram(shape));
+  card.appendChild(make('small',shape.map(function(n){return n<0?'×':n}).join(' ')));
+ }else card.appendChild(make('small',t('Hmat neurčen','Unknown shape')));
+ if(description)card.appendChild(make('p',description));
+ return card;
+}
+function chartChoice(group,label,options){
+ var panel=make('details',undefined,'chart-choice');
+ panel.appendChild(make('summary',label));
+ panel.ontoggle=function(){
+  if(!panel.open || panel.children.length>1)return;
+  var list=make('div',undefined,'chart-options'),choices=options();
+  choices.forEach(function(option){list.appendChild(chartCard(option.symbol,option.shape,option.description))});
+  if(!choices.length)list.appendChild(make('small',t('Další vhodný hmat nenalezen.','No suitable alternative found.')));
+  panel.appendChild(list);
+ };
+ group.appendChild(panel);
+}
 var chartSymbols=[];
 function showCharts(){
  var box=el('charts');clear(box);
  if(!el('guitar').open)return;
+ var scale=likelyScale(chartSymbols);
  chartSymbols.forEach(function(symbol){
-  var card=make('div',undefined,'chart'),shape=guitarShape(symbol);
-  card.appendChild(make('b',symbol));
-  if(shape){
-   card.appendChild(guitarDiagram(shape));
-   card.appendChild(make('small',shape.map(function(n){return n<0?'×':n}).join(' ')));
-  }else card.appendChild(make('small',t('Hmat neurčen','Unknown shape')));
-  box.appendChild(card);
+  var group=make('div',undefined,'chart-group'),shape=guitarShape(symbol),spec=chordSpec(symbol);
+  group.appendChild(chartCard(symbol,shape));
+  if(spec){
+   chartChoice(group,t('Jiné prstoklady','Other fingerings'),function(){return sameChordOptions(symbol,spec,shape)});
+   if(!spec.slash && ['','maj','m'].includes(spec.quality)){
+    chartChoice(group,t('Harmonické obměny','Harmonic variations'),function(){return harmonicOptions(spec,scale)});
+   }
+  }
+  box.appendChild(group);
  });
 }
 el('guitar').ontoggle=showCharts;
@@ -264,7 +404,8 @@ function songLabel(value){
  var labels={'Text s akordy':'Lyrics and chords','Text bez akordů':'Lyrics only','Akordový doprovod':'Chord accompaniment','Refrén':'Chorus','Sloka':'Verse','Mezihra':'Interlude','PDF uvádí 3. pražec, původní název souboru uvádí 2.':'The PDF specifies fret 3; the original filename specifies fret 2.','Umístění doplněných akordů ve slokách je odvozené podle předchozí sloky.':'Added verse chord positions follow the preceding verse.'};
  return labels[value] || value.replace(/^(\d+)\. sloka$/i,'Verse $1');
 }
-function render(){var s=current,score=el('score'),ch=[];clear(score);el('title').textContent=s.title;el('artist').textContent=s.artist;el('status').textContent=songLabel(s.note)||'';el('chords').textContent='';el('cap').textContent='';el('tools').style.display=s.cho?'flex':'none';score.style.fontSize=size+'px';
+function render(){var s=current,score=el('score'),ch=[];clear(score);el('title').textContent=s.title;el('artist').textContent=s.artist;el('status').textContent=songLabel(s.note)||'';el('chords').textContent='';el('cap').textContent='';el('tools').style.display=s.cho?'flex':'none';score.style.fontSize=size+'px';el('play').hidden=!s.cho;
+ if(!s.cho){el('guitar').hidden=true;if(document.body.classList.contains('playing'))playMode(false)}
  var harmonicas=['C','','D','','E','F','','G','','A','','H'];
  var sourceCapo=Number(meta(s.cho||'','capo'))||0;
  var capo=capoSetting(sourceCapo);
@@ -314,10 +455,35 @@ function render(){var s=current,score=el('score'),ch=[];clear(score);el('title')
   }
   score.appendChild(row);
  });
- groupStanzas(score);markReports(score);chartSymbols=ch;el('guitar').hidden=!ch.length;el('chords').textContent=ch.join(' · ');showCharts();el('pitch').textContent=pitchText(shift);el('pitch-hint').hidden=!shift;el('pitch-hint').textContent=pitchText(shift);el('small').disabled=size<=14;el('big').disabled=size>=40;el('down').disabled=shift<=-12;el('up').disabled=shift>=12}
+ groupStanzas(score);schedulePages();markReports(score);chartSymbols=ch;el('guitar').hidden=!ch.length;el('chords').textContent=ch.join(' · ');showCharts();el('pitch').textContent=pitchText(shift);el('pitch-hint').hidden=!shift;el('pitch-hint').textContent=pitchText(shift);el('small').disabled=size<=14;el('big').disabled=size>=40;el('down').disabled=shift<=-12;el('up').disabled=shift>=12}
+}
+var settingKinds=['capo','pitch','zoom'],songAliases=new Map();
+function songKey(song){return song.id?'id:'+song.id:song.file}
+function resolveSongKey(key){return songAliases.get(key)||key}
+function indexSongSettings(){
+ songAliases=new Map();
+ // An earlier filename still identifies its original arrangement if the name is reused.
+ songs.forEach(function(song){
+  (song.legacyFiles||[]).forEach(function(file){songAliases.set(file,songKey(song))});
+ });
+ songs.forEach(function(song){
+  if(!songAliases.has(song.file))songAliases.set(song.file,songKey(song));
+ });
+ try{
+  songAliases.forEach(function(key,file){
+   if(key===file)return;
+   settingKinds.forEach(function(kind){
+    var legacy='zpevnik.'+kind+'.'+file, target='zpevnik.'+kind+'.'+key;
+    var value=localStorage.getItem(legacy);
+    if(value===null)return;
+    if(localStorage.getItem(target)===null)localStorage.setItem(target,value);
+    localStorage.removeItem(legacy);
+   });
+  });
+ }catch(ignore){}
 }
 function capoSetting(original){
- var select=el('capo-fret'),stored=get('capo.'+current.file,'');
+ var select=el('capo-fret'),stored=get('capo.'+songKey(current),'');
  clear(select);
  function option(value,label){
   var item=make('option',label);item.value=value;select.appendChild(item);
@@ -330,7 +496,7 @@ function capoSetting(original){
 }
 el('capo-fret').onchange=function(){
  try{
-  var key='zpevnik.capo.'+current.file;
+  var key='zpevnik.capo.'+songKey(current);
   if(this.value==='')localStorage.removeItem(key);
   else localStorage.setItem(key,this.value);
   render();
@@ -339,7 +505,7 @@ el('capo-fret').onchange=function(){
  }
 };
 function storedPitch(){
- var value=get('pitch.'+current.file,null);
+ var value=get('pitch.'+songKey(current),null);
  return value!==null && /^-?\d+$/.test(value) && Math.abs(Number(value))<=12?Number(value):null;
 }
 function pitchText(n){return (n>0?'+':'')+n}
@@ -351,7 +517,7 @@ el('song-settings-button').onclick=function(){showSongSettings(el('song-settings
 function setPitch(value){
  var next=Math.max(-12,Math.min(12,value));
  try{
-  var key='zpevnik.pitch.'+current.file;
+  var key='zpevnik.pitch.'+songKey(current);
   if(next===0)localStorage.removeItem(key);else localStorage.setItem(key,String(next));
  }catch(error){el('status').textContent=t('Transpozici se nepodařilo uložit.','Could not save transposition.');return}
  shift=next;render();
@@ -359,31 +525,109 @@ function setPitch(value){
 function loadSongSettings(){
  showSongSettings(false);
  shift=storedPitch()||0;
- size=Math.min(40,Math.max(14,Number(get('zoom.'+current.file,get('text','21')))||21));
+ size=Math.min(40,Math.max(14,Number(get('zoom.'+songKey(current),get('text','21')))||21));
 }
+var pages=[],pageTail,layoutFrame=0;
 function pageState(){
  if(!document.body.classList.contains('playing'))return;
- var area=el('score');
- el('prev-page').disabled=area.scrollTop<=0;
- el('next-page').disabled=area.scrollTop+area.clientHeight>=area.scrollHeight-1;
+ var area=el('score'),position=area.scrollTop;
+ var page=pages.find(function(page){return Math.abs(Math.floor(page.start)-position)<.5});
+ var gap=page?Math.max(0,area.clientHeight-(page.end-position)):0;
+ var frame=el('score-frame');
+ frame.style.setProperty('--page-gap',gap+'px');
+ frame.style.setProperty('--page-top-gap',(page?Math.max(0,page.start-position):0)+'px');
+ el('prev-page').disabled=position<=0;
+ el('next-page').disabled=!pages.length || position>=Math.floor(pages[pages.length-1].start)-.5;
+}
+function scoreBreaks(area){
+ var origin=area.getBoundingClientRect().top-area.scrollTop;
+ var breaks=[0],keepHeading=false;
+ area.querySelectorAll('.stanza-block > *').forEach(function(row,index){
+  var top=row.getBoundingClientRect().top-origin;
+  if(index && !keepHeading)breaks.push(top);
+  keepHeading=row.classList.contains('section');
+  if(!row.classList.contains('line'))return;
+  // Inline-block words keep a chord with its lyric. Words in the same visual
+  // row can have different heights, so combine their overlapping rectangles.
+  var bands=[];
+  row.querySelectorAll(':scope > .word').forEach(function(word){
+   var rect=word.getBoundingClientRect(),last=bands[bands.length-1];
+   if(last && rect.top<last.bottom-.5){
+    last.top=Math.min(last.top,rect.top);last.bottom=Math.max(last.bottom,rect.bottom);
+   }else bands.push({top:rect.top,bottom:rect.bottom});
+  });
+  bands.slice(1).forEach(function(band){breaks.push(band.top-origin)});
+  var lyric=row.querySelector('.progression-text');
+  if(lyric){
+   // Keep the opening lyric with the progression. Later wraps can start a page.
+   var range=document.createRange();range.selectNodeContents(lyric);
+   var leading=(parseFloat(getComputedStyle(lyric).lineHeight)-parseFloat(getComputedStyle(lyric).fontSize))/2;
+   Array.from(range.getClientRects()).slice(1).forEach(function(rect){breaks.push(rect.top-origin-leading)});
+  }
+ });
+ return Array.from(new Set(breaks)).sort(function(a,b){return a-b});
+}
+function measurePages(){
+ layoutFrame=0;
+ if(!document.body.classList.contains('playing'))return;
+ var area=el('score'),position=area.scrollTop,height=area.clientHeight;
+ if(!height)return;
+ var wasPaged=pages.some(function(page){return Math.abs(Math.floor(page.start)-position)<.5});
+ if(pageTail)pageTail.remove();
+ var breaks=scoreBreaks(area),end=area.scrollHeight,index=0,start=0;
+ pages=[];
+ // Fit as many visual rows as possible. An oversized item such as a tab image
+ // gets consecutive viewports with overlap so its entire content is reachable.
+ while(Math.floor(start)+height<end){
+  var limit=Math.floor(start)+height;
+  while(index+1<breaks.length && breaks[index+1]<=limit)index++;
+  var fits=Math.floor(breaks[index])>Math.floor(start);
+  var boundary=fits?breaks[index]:limit;
+  pages.push({start:start,end:boundary});
+  var overlap=Math.min(24,Math.floor(height/4));
+  start=fits?boundary:boundary-overlap;
+ }
+ pages.push({start:start,end:end});
+ pageTail=make('div');
+ pageTail.setAttribute('aria-hidden','true');
+ pageTail.style.height=Math.max(0,Math.ceil(start)+height-end)+'px';
+ area.appendChild(pageTail);
+ el('score-frame').style.setProperty('--score-scrollbar',(area.offsetWidth-area.clientWidth)+'px');
+ if(wasPaged){
+  var containing=pages.find(function(page,i){return !pages[i+1] || Math.floor(pages[i+1].start)>position});
+  area.scrollTop=Math.floor(containing.start);
+ }else area.scrollTop=position;
+ pageState();
+}
+function schedulePages(){
+ if(document.body.classList.contains('playing') && !layoutFrame)layoutFrame=requestAnimationFrame(measurePages);
 }
 function playMode(on){
  document.body.classList.toggle('playing',on);
  el('play').setAttribute('aria-pressed',String(on));
  el('play').textContent=on?t('Zavřít hraní','Exit play mode'):t('Režim hraní','Play mode');
- el('score').scrollTop=0;pageState();el('playing-title').textContent=current.title;
- if(on)el('exit-play').focus();
+ el('score').scrollTop=0;
+ pages=[];
+ if(on){schedulePages();el('exit-play').focus()}
+ else if(pageTail){pageTail.remove();pageTail=null}
+ el('playing-title').textContent=current.title;
  window.scrollTo(0,0);
 }
 el('play').onclick=function(){playMode(!document.body.classList.contains('playing'))};
 el('exit-play').onclick=function(){playMode(false);el('play').focus()};
 function turnPage(direction){
  var area=el('score');
- area.scrollTop+=direction*area.clientHeight;pageState();
+ if(layoutFrame){cancelAnimationFrame(layoutFrame);measurePages()}
+ var position=area.scrollTop,ordered=direction>0?pages:pages.slice().reverse();
+ var target=ordered.find(function(page){return (Math.floor(page.start)-position)*direction>.5});
+ if(target)area.scrollTop=Math.floor(target.start);
+ pageState();
 }
 el('score').addEventListener('scroll',pageState);
-el('score').addEventListener('toggle',pageState,true);
-window.addEventListener('resize',pageState);
+el('score').addEventListener('toggle',schedulePages,true);
+el('score').addEventListener('load',schedulePages,true);
+window.addEventListener('resize',schedulePages);
+if(window.ResizeObserver)new ResizeObserver(schedulePages).observe(el('score-frame'));
 el('prev-page').onclick=function(){turnPage(-1)};
 el('next-page').onclick=function(){turnPage(1)};
 function groupStanzas(score){
@@ -399,7 +643,7 @@ var notePrefix='zpevnik.line-note.',selectedLine=null,triggerRow=null;
 function openReport(row){
  if(!row)return;
  var index=Number(row.dataset.sourceLine),lines=current.cho.split(/\r?\n/);
- selectedLine={song:current.title,artist:current.artist,file:current.file,revision:current.revision||1,
+ selectedLine={song:current.title,artist:current.artist,file:current.file,id:current.id,revision:current.revision||1,
   libraryVersion:libraryVersion,line:index+1,section:row.dataset.section||'',block:Number(row.closest('.stanza-block').dataset.block),source:lines[index],displayShift:shift};
  triggerRow=row;
  el('report-context').textContent=[current.title,selectedLine.section||t('Blok ','Block ')+selectedLine.block,t('řádek ','line ')+(index+1)].filter(Boolean).join(' · ');
@@ -421,14 +665,22 @@ el('report-form').onsubmit=function(event){
 function reports(){
  var items=[];
  for(var i=0;i<localStorage.length;i++){
-  var key=localStorage.key(i);if(key && key.indexOf(notePrefix)===0)items.push(JSON.parse(localStorage.getItem(key)));
+  var key=localStorage.key(i);
+  if(!key || key.indexOf(notePrefix)!==0)continue;
+  var record=JSON.parse(localStorage.getItem(key));
+  var resolved=resolveSongKey(record.file);
+  if(!record.id && resolved && resolved.indexOf('id:')===0){
+   record.id=resolved.slice(3);
+   try{localStorage.setItem(key,JSON.stringify(record))}catch(ignore){}
+  }
+  items.push(record);
  }
  return items.sort(function(a,b){return a.created.localeCompare(b.created)});
 }
 function markReports(score){
  try{
   reports().forEach(function(r){
-   if(r.file!==current.file || r.revision!==(current.revision||1) || !Number.isInteger(r.line))return;
+   if((r.id?'id:'+r.id:resolveSongKey(r.file))!==songKey(current) || r.revision!==(current.revision||1) || !Number.isInteger(r.line))return;
    var row=score.querySelector('[data-source-line="'+(r.line-1)+'"]');
    if(row)row.classList.add('reported');
   });
@@ -459,27 +711,30 @@ el('export-settings').onclick=function(){
    if(!match)continue;
    var raw=localStorage.getItem(key),n=Number(raw);
    if(raw!==String(n)||!validSetting(match[1],n))throw Error();
-   var file=match[2];
+   var file=resolveSongKey(match[2]);
    if(!entries[file])entries[file]={};
    entries[file][match[1]]=n;
   }
-  downloadJson('songbook-settings.json',{format:'kk-songbook-settings',version:1,songs:entries});
+  downloadJson('songbook-settings.json',{format:'kk-songbook-settings',version:2,songs:entries});
   settingsMessage(t('Exportováno skladeb: ','Songs exported: ')+Object.keys(entries).length);
  }catch(error){settingsMessage(t('Nastavení se nepodařilo exportovat.','Could not export settings.'))}
 };
 function importSettings(data){
- if(!data || data.format!=='kk-songbook-settings' || data.version!==1 || !data.songs ||
+ if(!data || data.format!=='kk-songbook-settings' || [1,2].indexOf(data.version)<0 || !data.songs ||
     typeof data.songs!=='object' || Array.isArray(data.songs))throw Error();
- var files=Object.keys(data.songs),changes=[];
+ var files=Object.keys(data.songs),changes=new Map();
  files.forEach(function(file){
   var entry=data.songs[file];
   if(!file || !entry || typeof entry!=='object' || Array.isArray(entry) || !Object.keys(entry).length)throw Error();
   Object.keys(entry).forEach(function(kind){
    if((kind!=='pitch' && kind!=='capo' && kind!=='zoom') || !validSetting(kind,entry[kind]))throw Error();
-   var key='zpevnik.'+kind+'.'+file;
-   changes.push({key:key,value:String(entry[kind]),previous:localStorage.getItem(key)});
+   var resolved=resolveSongKey(file),key='zpevnik.'+kind+'.'+resolved;
+   if(file===resolved || !changes.has(key)){
+    changes.set(key,{key:key,value:String(entry[kind]),previous:localStorage.getItem(key)});
+   }
   });
  });
+ changes=Array.from(changes.values());
  var written=0;
  try{
   for(;written<changes.length;written++)localStorage.setItem(changes[written].key,changes[written].value);
@@ -490,10 +745,10 @@ function importSettings(data){
   }
   throw error;
  }
- var active=data.songs[current.file];
- if(active){
-  if(active.zoom!==undefined)size=active.zoom;
-  if(active.pitch!==undefined)shift=active.pitch;
+ var active=songKey(current);
+ if(settingKinds.some(function(kind){return changes.some(function(change){return change.key==='zpevnik.'+kind+'.'+active})})){
+  shift=storedPitch()||0;
+  size=Math.min(40,Math.max(14,Number(get('zoom.'+active,get('text','21')))||21));
   render();
  }
  return files.length;
@@ -545,9 +800,9 @@ document.addEventListener('keydown',function(e){
 
 el('search').oninput=list;
 function saveZoom(){
- save('text',size);save('zoom.'+current.file,size);
+ save('text',size);save('zoom.'+songKey(current),size);
 }
-function resize(d){size=Math.max(14,Math.min(40,size+d));saveZoom();render();pageState()}
+function resize(d){size=Math.max(14,Math.min(40,size+d));saveZoom();render()}
 var pinch=null;
 function fingerDistance(points){
  var x=points[0].clientX-points[1].clientX,y=points[0].clientY-points[1].clientY;
@@ -561,10 +816,10 @@ scoreBox.addEventListener('touchstart',function(e){
 scoreBox.addEventListener('touchmove',function(e){
  if(!pinch||e.touches.length!==2)return;
  e.preventDefault();size=Math.max(14,Math.min(40,Math.round(pinch.size*fingerDistance(e.touches)/pinch.distance)));
- scoreBox.style.fontSize=size+'px';
+ scoreBox.style.fontSize=size+'px';schedulePages();
 },{passive:false});
 function endPinch(e){
- if(pinch && e.touches.length<2){pinch=null;saveZoom();el('small').disabled=size<=14;el('big').disabled=size>=40;pageState()}
+ if(pinch && e.touches.length<2){pinch=null;saveZoom();el('small').disabled=size<=14;el('big').disabled=size>=40;schedulePages()}
 }
 scoreBox.addEventListener('touchend',endPinch);
 scoreBox.addEventListener('touchcancel',endPinch);
@@ -573,17 +828,28 @@ el('up').onclick=function(){setPitch(shift+1)};el('down').onclick=function(){set
 var cacheKey='zpevnik.library.v1';
 function validateLibrary(data){
  if(!data || data.schema!==1 || typeof data.version!=='number' || data.version<1 ||
-    data.version%1!==0 || !Array.isArray(data.songs) || !data.songs.length || !Array.isArray(data.catalog))throw Error('format');
+    data.version%1!==0 || !Array.isArray(data.songs) || !Array.isArray(data.catalog))throw Error('format');
  if(!data.songs.every(function(s){return s && typeof s.title==='string' && typeof s.artist==='string' &&
-    typeof s.file==='string' && typeof s.cho==='string' && s.cho.length>0 &&
+    typeof s.file==='string' && s.file.length>0 &&
+    (s.id===undefined || (typeof s.id==='string' && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(s.id))) &&
+    (s.legacyFiles===undefined || (Array.isArray(s.legacyFiles) &&
+     s.legacyFiles.every(function(file){return typeof file==='string' && file.length>0}))) && typeof s.cho==='string' && s.cho.length>0 &&
     (!s.changes || (Array.isArray(s.changes) && s.changes.every(function(c){
      return c && typeof c.author==='string' && typeof c.revision==='number' && isFinite(Date.parse(c.date));
     })))}) ||
+    new Set(data.songs.map(songKey)).size!==data.songs.length ||
+    new Set(data.songs.map(function(s){return s.file})).size!==data.songs.length ||
     !data.catalog.every(function(r){return r && typeof r.name==='string'}))throw Error('format');
 }
 function useLibrary(data){
- songs=data.songs;catalog=data.catalog;libraryVersion=data.version;
- sortLibrary();
+ var known=new Map(songs.map(function(song){return [song.file,song]}));
+ songs=data.songs.map(function(song){
+  var previous=known.get(song.file);
+  if(song.id || !previous || !previous.id)return song;
+  return Object.assign({},song,{id:previous.id,legacyFiles:previous.legacyFiles});
+ });
+ catalog=data.catalog;libraryVersion=data.version;
+ sortLibrary();indexSongSettings();
 }
 try{
  var stored=JSON.parse(localStorage.getItem(cacheKey));
@@ -602,9 +868,9 @@ function installLibrary(data){
  // Write the complete replacement before changing the current view.
  try{localStorage.setItem(cacheKey,JSON.stringify(data))}
  catch(error){updateMessage('Data se nepodařilo uložit. Stáhni si nové vydání aplikace.','Unable to save offline data. Download the latest app release.');return}
- var selected=current.file;
+ var selected=songKey(current);
  useLibrary(data);
- current=songs.filter(function(s){return s.file===selected && visible(s)})[0] || songs.filter(visible)[0] || songs[0];
+ current=songs.find(function(s){return songKey(s)===resolveSongKey(selected) && visible(s)}) || songs.find(visible) || noSong;
  loadSongSettings();list();render();el('update-fallback').hidden=true;
  updateMessage('Aktualizováno. Skladeb v knihovně: '+songs.length,'Updated. Songs in the library: '+songs.length);
 }
@@ -677,10 +943,10 @@ el('update-file').onchange=function(){
  reader.onerror=failed;reader.readAsText(file);input.value='';
 };
 
-translatePage();theme();
+indexSongSettings();translatePage();theme();
 el('search').value=libraryView.query;
-current=songs.filter(function(song){return visible(song)&&song.file===libraryView.file})[0] ||
- songs.filter(function(song){return visible(song)&&song.title==='Runaway'})[0] || songs.filter(visible)[0];
+current=songs.filter(function(song){return visible(song)&&songKey(song)===resolveSongKey(libraryView.file)})[0] ||
+ songs.filter(function(song){return visible(song)&&song.title==='Runaway'})[0] || songs.find(visible) || noSong;
 loadSongSettings();
 document.body.classList.toggle('browse',!!libraryView.browse);
 el('toggle').setAttribute('aria-expanded',String(!!libraryView.browse));

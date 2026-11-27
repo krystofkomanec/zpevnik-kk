@@ -7,6 +7,7 @@ import json
 import re
 import subprocess
 import unicodedata
+import uuid
 from pathlib import Path
 
 from import_pdf import convert
@@ -93,24 +94,75 @@ def update_readme(catalog,songs):
     path.write_text(prefix+'<!-- statistics:start -->\n'+activity_report(songs)+'\n<!-- statistics:end -->'+suffix)
 
 
-def build():
-    library = ROOT/'knihovna.js'
-    source, overview = library.read_text().strip().removesuffix(';').split(';\nvar catalog=')
-    songs = json.loads(source.removeprefix('var songs='))
-    catalog = load(ROOT/'tools/pending-sources.json', [])
+ID_DIRECTIVE = re.compile(r'^\{x-arrangement-id: ([0-9a-f-]{36})\}$', re.M)
+REVISION_FIELDS = ('tabImages', 'cho', 'lang', 'lyricsLanguage', 'title', 'artist',
+                   'minor', 'kind', 'note', 'keyBasis')
+
+
+def read_arrangement(path):
+    text = path.read_text()
+    markers = list(ID_DIRECTIVE.finditer(text))
+    if not markers:
+        if '{x-arrangement-id:' in text:
+            raise ValueError(f'Malformed arrangement ID in {path}')
+        return None, text.rstrip() + '\n'
+    marker = markers[0]
+    if len(markers) != 1 or text[marker.end():].strip():
+        raise ValueError(f'Keep one arrangement ID on the last line of {path}')
+    return str(uuid.UUID(marker[1])), text[:marker.start()].rstrip() + '\n'
+
+
+def new_id(file, source, legacy):
+    origin = 'legacy' if legacy else subprocess.check_output(
+        ['git', 'log', '-1', '--format=%H', '--', str(source)], cwd=ROOT, text=True
+    ).strip()
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, f'kk-songbook/{origin}/{file}'))
+
+
+def chord_notation(cho, language):
+    symbols = re.findall(r'\[([^\]]+)\]', cho)
+    czech_notes = any(re.match(r'^H|^[A-H](?:is|es|[#b])?mi(?!n)', c) for c in symbols)
+    return 'cz' if czech_notes or language == 'cs' else 'en'
+
+
+def import_pdfs(state, arrangements, previous, catalog):
     provenance = {}
-    state_path = ROOT/'tools/imports.json'
-    state = load(state_path, {})
-    by_file = {s['file']:s for s in songs}
+    by_id = {identifier: file for file, (_, identifier, _) in arrangements.items() if identifier}
+    imported_digests = {entry['sha256']: entry for entry in state.values()}
     for path in sorted((ROOT/'inbox').rglob('*')):
         if not path.is_file() or path.suffix.lower() != '.pdf':
             continue
-        key = unicodedata.normalize('NFC',path.relative_to(ROOT).as_posix())
+        key = unicodedata.normalize('NFC', path.relative_to(ROOT).as_posix())
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        name = unicodedata.normalize('NFC',path.stem)
-        entry = state.get(key,{})
-        if entry.get('sha256') == digest and entry.get('file') in by_file:
+        entry = state.get(key)
+        if not entry and digest in imported_digests:
+            # A copy of an imported PDF cannot recreate an arrangement. Preserve
+            # the deletion record under the copy's name in case it is edited later.
+            prior_import = imported_digests[digest]
+            prior_file = by_id.get(prior_import['id']) if prior_import.get('id') else prior_import['file']
+            if prior_file not in arrangements:
+                state[key] = dict(prior_import)
             continue
+        name = unicodedata.normalize('NFC', path.stem)
+        file = (by_id.get(entry['id']) if entry.get('id') else entry['file']) if entry else name+'.cho'
+        if entry:
+            # Keep the import record even after the arrangement is deliberately removed.
+            if file not in arrangements:
+                continue
+            target, identifier, current = arrangements[file]
+            if identifier:
+                entry.update(id=identifier, file=file)
+            generated = entry.get('generatedHash')
+            if entry.get('generated') and ((generated and generated != digest_text(current)) or (
+                    not generated and previous.get(file, {}).get('cho') != current)):
+                entry['generated'] = False
+            if entry['sha256'] == digest:
+                if entry.get('generated'):
+                    entry['generatedHash'] = digest_text(current)
+                continue
+        else:
+            target, identifier = ROOT/'ChordPro'/file, None
+
         artist, sep, title = name.partition(' - ')
         language = 'und'
         try:
@@ -118,65 +170,110 @@ def build():
                 raise ValueError('Use inbox and name the file Artist - Title.pdf')
             if any(c in name for c in '{}\r\n'):
                 raise ValueError('Unsupported characters in filename')
-            file = name+'.cho'
-            target = ROOT/'ChordPro'/file
-            if target.exists() and entry.get('file')!=file:
+            if not entry and file in arrangements:
                 raise ValueError('A song with this name already exists; use a distinct arrangement name')
-            if entry.get('file') and not entry.get('generated'):
+            if entry and not entry.get('generated'):
                 raise ValueError('Revised source for a manually edited arrangement; review before replacing')
-            cho = convert(path,artist,title)
-            language = lyrics_language(cho)
-            symbols = re.findall(r'\[([^\]]+)\]',cho)
-            czech_notes = any(re.match(r'^H|^[A-H](?:is|es|[#b])?mi(?!n)', c) for c in symbols)
-            target.write_text(cho)
-            song = dict(title=title,artist=artist,file=file,lang='cz' if czech_notes or language=='cs' else 'en',cho=cho,lyricsLanguage=language)
-            by_file[file]=song
-            provenance[file]=key
-            state[key]={'sha256':digest,'file':file,'generated':True}
-        except (ValueError,subprocess.CalledProcessError) as error:
+            cho = convert(path, artist, title).rstrip() + '\n'
+            arrangements[file] = (target, identifier, cho)
+            provenance[file] = path.relative_to(ROOT)
+            state[key] = dict(sha256=digest, file=file, generated=True, generatedHash=digest_text(cho))
+            imported_digests[digest] = state[key]
+        except (ValueError, subprocess.CalledProcessError) as error:
             print(f'Review required: {key}: {error}')
-            catalog.append(dict(name=path.name,title=title,artist=artist,format='PDF',inbox=key,lyricsLanguage=language))
-    payload=ROOT/'library.json'
-    old=load(payload,{})
-    previous={s['file']:s for s in old.get('songs',[])}
+            catalog.append(dict(name=path.name, title=title, artist=artist, format='PDF',
+                                inbox=key, lyricsLanguage=language))
+    return provenance
+
+
+def digest_text(text):
+    return hashlib.sha256(text.encode()).hexdigest()
+
+
+def build():
+    library = ROOT/'knihovna.js'
+    payload = ROOT/'library.json'
+    old = load(payload, {})
+    previous = {s['file']: s for s in old.get('songs', [])}
+    previous_by_id = {s['id']: s for s in previous.values() if 'id' in s}
+    catalog = load(ROOT/'tools/pending-sources.json', [])
+    state_path = ROOT/'tools/imports.json'
+    state = load(state_path, {})
+    arrangements = {}
+    identifiers = set()
     for path in sorted((ROOT/'ChordPro').glob('*.cho')):
-        file=unicodedata.normalize('NFC',path.name)
-        if file not in by_file:
-            cho=path.read_text()
-            def directive(field):
-                m=re.search(r'^\{'+field+r':\s*([^}]+)\}',cho,re.M|re.I)
-                return m[1].strip() if m else ''
-            language=lyrics_language(cho)
-            by_file[file]=dict(file=file,title=directive('title') or path.stem,
-                               artist=directive('artist'),lyricsLanguage=language,
-                               lang='cz' if language=='cs' else 'en')
-    for file,song in by_file.items():
-        path=ROOT/'ChordPro'/file
-        song['cho']=path.read_text().rstrip()+'\n'
-        tab_files = re.findall(r'^\{image: src="(tabs/[a-z0-9-]+\.png)"\}$', song['cho'], re.M)
+        file = unicodedata.normalize('NFC', path.name)
+        identifier, cho = read_arrangement(path)
+        if file in arrangements or identifier in identifiers:
+            raise ValueError(f'Duplicate arrangement filename or ID: {path}')
+        if identifier:
+            identifiers.add(identifier)
+        arrangements[file] = (path, identifier, cho)
+    provenance = import_pdfs(state, arrangements, previous, catalog)
+
+    by_prior_file = {}
+    new = []
+    pending_sources = []
+    for file, (path, identifier, cho) in arrangements.items():
+        prior = previous_by_id.get(identifier)
+        # Before the first ID-aware build, a previous filename is the only key.
+        if prior is None and file in previous and 'id' not in previous[file]:
+            prior = previous[file]
+        source = provenance.get(file, path.relative_to(ROOT))
+        if not identifier:
+            identifier = new_id(file, source, prior is not None)
+            if identifier in identifiers:
+                raise ValueError(f'Duplicate arrangement ID: {path}')
+            identifiers.add(identifier)
+            pending_sources.append((path, cho + '{x-arrangement-id: '+identifier+'}\n'))
+        elif file in provenance:
+            pending_sources.append((path, cho + '{x-arrangement-id: '+identifier+'}\n'))
+        song = dict(prior or {})
+        def directive(field):
+            match = re.search(r'^\{'+field+r':\s*([^}]+)\}', cho, re.M | re.I)
+            return match[1].strip() if match else ''
+        title = directive('title') or song.get('title') or path.stem
+        song.update(file=file, id=identifier, cho=cho, title=title, artist=directive('artist'))
+        if not prior or file in provenance:
+            language = lyrics_language(cho)
+            song.update(lyricsLanguage=language, lang=chord_notation(cho, language))
+        if prior and prior['file'] != file:
+            song['legacyFiles'] = list(dict.fromkeys([*prior.get('legacyFiles', []), prior['file']]))
+        tab_files = re.findall(r'^\{image: src="(tabs/[a-z0-9-]+\.png)"\}$', cho, re.M)
         if tab_files:
             song['tabImages'] = {name: base64.b64encode((path.parent/name).read_bytes()).decode('ascii')
                                  for name in sorted(set(tab_files))}
         else:
             song.pop('tabImages', None)
-        prior=previous.get(file)
-        revision=prior.get('revision',1) if prior else 0
-        changes=list(prior.get('changes',[])) if prior else []
-        fields=('tabImages','cho','lang','lyricsLanguage','title','artist','minor','kind','note')
-        if not prior or any(prior.get(key)!=song.get(key) for key in fields):
-            revision+=1
-            changes.append(song_change(provenance.get(file,path.relative_to(ROOT)), revision))
-        added = (prior or {}).get('addedAt') or song.get('addedAt')
-        if not added:
+        revision = prior.get('revision', 1) if prior else 0
+        changes = list(prior.get('changes', [])) if prior else []
+        if not prior or any(prior.get(key) != song.get(key) for key in REVISION_FIELDS):
+            revision += 1
+            changes.append(song_change(source, revision))
+        if not song.get('addedAt'):
             added = next((event['date'] for event in changes if event['revision'] == 1), None)
-        if added:
-            song['addedAt'] = added
-        if prior and prior.get('sourceDate'):
-            song['sourceDate'] = prior['sourceDate']
-            if prior.get('sourceTimestamp'):
-                song['sourceTimestamp'] = prior['sourceTimestamp']
-        song.update(revision=revision,changes=changes)
-    songs=list(by_file.values())
+            if added:
+                song['addedAt'] = added
+        song.update(revision=revision, changes=changes)
+        if prior:
+            by_prior_file[prior['file']] = song
+        else:
+            new.append(song)
+    songs = [by_prior_file[file] for file in previous if file in by_prior_file] + new
+    songs_by_file = {s['file']: s for s in songs}
+    for entry in state.values():
+        song = songs_by_file.get(entry['file'])
+        if not entry.get('id') and song:
+            entry['id'] = song['id']
+    imported_paths = {arrangements[file][0] for file in provenance}
+    for path, content in pending_sources:
+        if path in imported_paths:
+            path.write_text(content)
+        else:
+            # Appending the identity leaves existing source line numbers unchanged.
+            newline = b'' if path.read_bytes().endswith(b'\n') else b'\n'
+            with path.open('ab') as source_file:
+                source_file.write(newline + (content.splitlines()[-1] + '\n').encode())
     update_readme(catalog,songs)
     state_path.write_text(json.dumps(state,ensure_ascii=False,sort_keys=True,indent=2)+'\n')
     version=old.get('version',0)+int(old.get('songs')!=songs or bool(old.get('catalog')))

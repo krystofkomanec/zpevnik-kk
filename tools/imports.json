@@ -1,18 +1,22 @@
 {
   "inbox/Ed Sheeran - Perfect.pdf": {
     "file": "Ed Sheeran - Perfect.cho",
+    "id": "6f22485d-abba-5415-a753-c7f22a7438c6",
     "sha256": "565966e77c72a52b2cc702f69fee2b8138514d0b9ef3c35c72535a707676212e"
   },
   "inbox/Led Zeppelin - Stairway to Heaven.pdf": {
     "file": "Led Zeppelin - Stairway to Heaven.cho",
+    "id": "05828558-6373-588e-9d5c-ac97d8b9b549",
     "sha256": "49281d5984af5563644c34c02eece651aa258775cdc80710dcbd8a712f766204"
   },
   "inbox/Metallica - Nothing Else Matters.pdf": {
     "file": "Metallica - Nothing Else Matters.cho",
+    "id": "6f2387e7-3177-5295-ada6-48e82f728bac",
     "sha256": "afc69a734faa225b41fa78bd32125449948b2ae6ed80784d40fbffae4aceb2ef"
   },
   "inbox/Sum 41 - Pieces.pdf": {
     "file": "Sum 41 - Pieces.cho",
+    "id": "acb2106d-e4cb-5a31-95b1-b67f2b6b6909",
     "sha256": "0a980dadcd2137db6bed05134cdd452cd4f5c388b06e2ed69aae5b1a0b922be6"
   }
 }
