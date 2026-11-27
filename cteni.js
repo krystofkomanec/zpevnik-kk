@@ -7,7 +7,26 @@ function get(k,f){try{return localStorage.getItem('zpevnik.'+k)||f}catch(e){retu
 function save(k,v){try{localStorage.setItem('zpevnik.'+k,v)}catch(e){}}
 function fold(s){s=s.toLowerCase();return s.normalize?s.normalize('NFD').replace(/[\u0300-\u036f]/g,''):s}
 var size=Math.min(40,Math.max(14,Number(get('text','21'))||21)),dark=get('dark','0')==='1',current,shift=0;
-songs.sort(function(a,b){return Number(!!b.cho)-Number(!!a.cho)||a.title.localeCompare(b.title,'cs')});
+var order=el('library-order');
+order.value=get('order','title');if(!order.value)order.value='title';
+function songDate(song){
+ if(order.value==='source')return song.sourceDate||'';
+ if(order.value==='added'){
+  if(song.addedAt)return song.addedAt;
+  var first=(song.changes||[]).filter(function(c){return c.revision===1})[0];
+  return first?first.date:'';
+ }
+ return '';
+}
+function sortLibrary(){
+ songs.sort(function(a,b){
+  var x=Date.parse(songDate(a)),y=Date.parse(songDate(b));
+  if(isFinite(x)!==isFinite(y))return isFinite(x)?-1:1;
+  return (y-x)||a.title.localeCompare(b.title,'cs')||a.file.localeCompare(b.file,'cs');
+ });
+}
+sortLibrary();
+order.onchange=function(){save('order',order.value);sortLibrary();el('list').scrollTop=0;list();rememberLibrary()};
 var english = get('language','cs') === 'en';
 function t(cs,en){return english ? en : cs}
 function visible(song){return !english || song.lyricsLanguage === 'en'}
@@ -59,6 +78,11 @@ function list(){
  songs.forEach(function(s){
   if(!visible(s)||fold(s.title+' '+s.artist).indexOf(q)<0)return;
   var b=make('button',s.title,'item');b.appendChild(make('small',s.artist||''));
+  if(order.value!=='title'){
+   var stamp=songDate(s),date=stamp?new Date(stamp):null;
+   var day=order.value==='source' && stamp?new Date(stamp+'T12:00:00'):date;
+   b.appendChild(make('small',day && isFinite(day.getTime())?day.toLocaleDateString(t('cs-CZ','en-GB')):t('Datum neznámé','Date unknown')));
+  }
   b.dataset.file=s.file;b.setAttribute('aria-current',s===current?'true':'false');
   b.onclick=function(){openSong(s,b)};box.appendChild(b);count++;
  });
@@ -489,7 +513,7 @@ function validateLibrary(data){
 }
 function useLibrary(data){
  songs=data.songs;catalog=data.catalog;libraryVersion=data.version;
- songs.sort(function(a,b){return a.title.localeCompare(b.title,'cs')});
+ sortLibrary();
 }
 try{
  var stored=JSON.parse(localStorage.getItem(cacheKey));

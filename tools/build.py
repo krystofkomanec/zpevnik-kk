@@ -159,6 +159,13 @@ def build():
         if not prior or any(prior.get(key)!=song.get(key) for key in fields):
             revision+=1
             changes.append(song_change(provenance.get(file,path.relative_to(ROOT)), revision))
+        added = (prior or {}).get('addedAt') or song.get('addedAt')
+        if not added:
+            added = next((event['date'] for event in changes if event['revision'] == 1), None)
+        if added:
+            song['addedAt'] = added
+        if prior and prior.get('sourceDate'):
+            song['sourceDate'] = prior['sourceDate']
         song.update(revision=revision,changes=changes)
     songs=list(by_file.values())
     update_readme(catalog,songs)
