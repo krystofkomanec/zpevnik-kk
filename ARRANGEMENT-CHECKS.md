@@ -2,18 +2,22 @@
 
 Automatically generated review candidates. Check the linked line against the source arrangement.
 
-Candidate lines: 140
+Candidate lines: 147
 
-- [Anna K. - Nebe, line 4](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Anna%20K.%20-%20Nebe.cho#L4) — Four or more chords before the first lyric word
-- [Bear's Den - Sophie, line 33](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Bear%27s%20Den%20-%20Sophie.cho#L33) — Four or more chords before the first lyric word
-- [Biffy Clyro - God And Satan, line 7](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Biffy%20Clyro%20-%20God%20And%20Satan.cho#L7) — Four or more chords before the first lyric word
+- [Alex Clare - Too Close, line 20](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Alex%20Clare%20-%20Too%20Close.cho#L20) — Repeated spaces between lyric characters
+- [All Time Low - Therapy, line 5](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/All%20Time%20Low%20-%20Therapy.cho#L5) — Repeated spaces between lyric characters
+- [Anna K. - Nebe, line 41](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Anna%20K.%20-%20Nebe.cho#L41) — Repeated spaces between lyric characters
+- [Billy Boyd - The Last Goodbye, line 15](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Billy%20Boyd%20-%20The%20Last%20Goodbye.cho#L15) — Repeated spaces between lyric characters
 - [Bratři Ryvolové - Sedmnáct dnů, line 20](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Brat%C5%99i%20Ryvolov%C3%A9%20-%20Sedmn%C3%A1ct%20dn%C5%AF.cho#L20) — Verse has no chords; an earlier verse of the same length has chords
 - [Bratři Ryvolové - Sedmnáct dnů, line 36](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Brat%C5%99i%20Ryvolov%C3%A9%20-%20Sedmn%C3%A1ct%20dn%C5%AF.cho#L36) — Verse has no chords; an earlier verse of the same length has chords
 - [Brutus - Zdá se mi, line 21](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Brutus%20-%20Zd%C3%A1%20se%20mi.cho#L21) — Verse has no chords; an earlier verse of the same length has chords
 - [Brutus - Zdá se mi, line 28](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Brutus%20-%20Zd%C3%A1%20se%20mi.cho#L28) — Verse has no chords; an earlier verse of the same length has chords
 - [Brutus - Zdá se mi, line 34](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Brutus%20-%20Zd%C3%A1%20se%20mi.cho#L34) — Verse has no chords; an earlier verse of the same length has chords
 - [Buty - František (kapo 2), line 28](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Buty%20-%20Franti%C5%A1ek%20%28kapo%202%29.cho#L28) — Verse has no chords; an earlier verse of the same length has chords
+- [Chinaski - Schody, line 74](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Chinaski%20-%20Schody.cho#L74) — Repeated spaces between lyric characters
 - [Chinaski - Tabáček, line 16](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Chinaski%20-%20Tab%C3%A1%C4%8Dek.cho#L16) — Verse has no chords; an earlier verse of the same length has chords
+- [David Stypka - Vrány taky (lepší), line 42](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/David%20Stypka%20-%20Vr%C3%A1ny%20taky%20%28lep%C5%A1%C3%AD%29.cho#L42) — Repeated spaces between lyric characters
+- [David Stypka - Čaruj, line 29](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/David%20Stypka%20-%20%C4%8Caruj.cho#L29) — Repeated spaces between lyric characters
 - [Druhá tráva - Ještě není tma, line 11](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Druh%C3%A1%20tr%C3%A1va%20-%20Je%C5%A1t%C4%9B%20nen%C3%AD%20tma.cho#L11) — Verse has no chords; an earlier verse of the same length has chords
 - [Druhá tráva - Ještě není tma, line 25](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Druh%C3%A1%20tr%C3%A1va%20-%20Je%C5%A1t%C4%9B%20nen%C3%AD%20tma.cho#L25) — Verse has no chords; an earlier verse of the same length has chords
 - [Druhá tráva - Na Španělských schodech, line 14](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Druh%C3%A1%20tr%C3%A1va%20-%20Na%20%C5%A0pan%C4%9Blsk%C3%BDch%20schodech.cho#L14) — Verse has no chords; an earlier verse of the same length has chords
@@ -21,6 +25,7 @@ Candidate lines: 140
 - [Druhá tráva - Na Španělských schodech, line 24](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Druh%C3%A1%20tr%C3%A1va%20-%20Na%20%C5%A0pan%C4%9Blsk%C3%BDch%20schodech.cho#L24) — Verse has no chords; an earlier verse of the same length has chords
 - [Druhá tráva - Sbohem Angelíno, line 9](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Druh%C3%A1%20tr%C3%A1va%20-%20Sbohem%20Angel%C3%ADno.cho#L9) — Verse has no chords; an earlier verse of the same length has chords
 - [Elán - Zanedbaný sex (kapo 3), line 27](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/El%C3%A1n%20-%20Zanedban%C3%BD%20sex%20%28kapo%203%29.cho#L27) — Verse has no chords; an earlier verse of the same length has chords
+- [Goo Goo Dolls - Iris, line 43](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Goo%20Goo%20Dolls%20-%20Iris.cho#L43) — Repeated spaces between lyric characters
 - [Greenhorns - John Hardy, line 13](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Greenhorns%20-%20John%20Hardy.cho#L13) — Verse has no chords; an earlier verse of the same length has chords
 - [Greenhorns - John Hardy, line 20](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Greenhorns%20-%20John%20Hardy.cho#L20) — Verse has no chords; an earlier verse of the same length has chords
 - [Greenhorns - John Hardy, line 27](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Greenhorns%20-%20John%20Hardy.cho#L27) — Verse has no chords; an earlier verse of the same length has chords
@@ -33,21 +38,24 @@ Candidate lines: 140
 - [Kamelot - Bella a Sebastián, line 19](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Kamelot%20-%20Bella%20a%20Sebasti%C3%A1n.cho#L19) — Verse has no chords; an earlier verse of the same length has chords
 - [Kamil Střihavka - Země vzdálená, line 19](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Kamil%20St%C5%99ihavka%20-%20Zem%C4%9B%20vzd%C3%A1len%C3%A1.cho#L19) — Verse has no chords; an earlier verse of the same length has chords
 - [Kamil Střihavka - Země vzdálená, line 27](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Kamil%20St%C5%99ihavka%20-%20Zem%C4%9B%20vzd%C3%A1len%C3%A1.cho#L27) — Verse has no chords; an earlier verse of the same length has chords
+- [Lady Gaga & Bradley Cooper - Shallow, line 11](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Lady%20Gaga%20%26%20Bradley%20Cooper%20-%20Shallow.cho#L11) — Repeated spaces between lyric characters
+- [MIG 21 - Hurá!, line 48](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/MIG%2021%20-%20Hur%C3%A1%21.cho#L48) — Repeated spaces between lyric characters
 - [Michal Tučný - Báječná ženská, line 15](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Michal%20Tu%C4%8Dn%C3%BD%20-%20B%C3%A1je%C4%8Dn%C3%A1%20%C5%BEensk%C3%A1.cho#L15) — Verse has no chords; an earlier verse of the same length has chords
 - [Michal Tučný - Báječná ženská, line 23](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Michal%20Tu%C4%8Dn%C3%BD%20-%20B%C3%A1je%C4%8Dn%C3%A1%20%C5%BEensk%C3%A1.cho#L23) — Verse has no chords; an earlier verse of the same length has chords
 - [Michal Tučný - Snídaně v trávě, line 16](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Michal%20Tu%C4%8Dn%C3%BD%20-%20Sn%C3%ADdan%C4%9B%20v%20tr%C3%A1v%C4%9B.cho#L16) — Verse has no chords; an earlier verse of the same length has chords
 - [Michal Tučný - Snídaně v trávě, line 26](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Michal%20Tu%C4%8Dn%C3%BD%20-%20Sn%C3%ADdan%C4%9B%20v%20tr%C3%A1v%C4%9B.cho#L26) — Verse has no chords; an earlier verse of the same length has chords
+- [Oasis - Champagne Supernova, line 4](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Oasis%20-%20Champagne%20Supernova.cho#L4) — Repeated spaces between lyric characters
 - [Olympic - Zrcadlo, line 12](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Olympic%20-%20Zrcadlo.cho#L12) — Verse has no chords; an earlier verse of the same length has chords
+- [Olympic - Želva, line 19](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Olympic%20-%20%C5%BDelva.cho#L19) — Repeated spaces between lyric characters
 - [Pacifik - Tulácké blues, line 12](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Pacifik%20-%20Tul%C3%A1ck%C3%A9%20blues.cho#L12) — Verse has no chords; an earlier verse of the same length has chords
 - [Pacifik - Tulácké blues, line 18](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Pacifik%20-%20Tul%C3%A1ck%C3%A9%20blues.cho#L18) — Verse has no chords; an earlier verse of the same length has chords
 - [Pacifik - Tulácké blues, line 24](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Pacifik%20-%20Tul%C3%A1ck%C3%A9%20blues.cho#L24) — Verse has no chords; an earlier verse of the same length has chords
 - [Pacifik - Tulácké blues, line 30](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Pacifik%20-%20Tul%C3%A1ck%C3%A9%20blues.cho#L30) — Verse has no chords; an earlier verse of the same length has chords
 - [Petr Muk - Bonsoir mademoiselle Paris, line 14](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Petr%20Muk%20-%20Bonsoir%20mademoiselle%20Paris.cho#L14) — Verse has no chords; an earlier verse of the same length has chords
+- [Pink Floyd - Comfortably Numb, line 34](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Pink%20Floyd%20-%20Comfortably%20Numb.cho#L34) — Repeated spaces between lyric characters
 - [Pokáč - Cowboy, line 29](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Pok%C3%A1%C4%8D%20-%20Cowboy.cho#L29) — Possible OCR substitution in chord line
 - [Poutníci - Wayfaring stranger, line 15](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Poutn%C3%ADci%20-%20Wayfaring%20stranger.cho#L15) — Verse has no chords; an earlier verse of the same length has chords
-- [Poutníci - Wayfaring stranger, line 20](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Poutn%C3%ADci%20-%20Wayfaring%20stranger.cho#L20) — Verse has no chords; an earlier verse of the same length has chords
 - [Poutníci - Wayfaring stranger, line 25](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Poutn%C3%ADci%20-%20Wayfaring%20stranger.cho#L25) — Verse has no chords; an earlier verse of the same length has chords
-- [Poutníci - Wayfaring stranger, line 30](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Poutn%C3%ADci%20-%20Wayfaring%20stranger.cho#L30) — Verse has no chords; an earlier verse of the same length has chords
 - [Rangers (Plavci) - Pole s bavlnou, line 19](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Rangers%20%28Plavci%29%20-%20Pole%20s%20bavlnou.cho#L19) — Verse has no chords; an earlier verse of the same length has chords
 - [Rangers (Plavci) - Pole s bavlnou, line 34](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Rangers%20%28Plavci%29%20-%20Pole%20s%20bavlnou.cho#L34) — Verse has no chords; an earlier verse of the same length has chords
 - [Rangers (Plavci) - Pole s bavlnou, line 49](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Rangers%20%28Plavci%29%20-%20Pole%20s%20bavlnou.cho#L49) — Verse has no chords; an earlier verse of the same length has chords
@@ -57,7 +65,12 @@ Candidate lines: 140
 - [Richard Müller - Baroko, line 32](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Richard%20M%C3%BCller%20-%20Baroko.cho#L32) — Verse has no chords; an earlier verse of the same length has chords
 - [Richard Müller - Baroko, line 42](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Richard%20M%C3%BCller%20-%20Baroko.cho#L42) — Verse has no chords; an earlier verse of the same length has chords
 - [Richard Müller - Baroko, line 48](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Richard%20M%C3%BCller%20-%20Baroko.cho#L48) — Verse has no chords; an earlier verse of the same length has chords
-- [Spirituál kvintet - Válka růží, line 22](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Spiritu%C3%A1l%20kvintet%20-%20V%C3%A1lka%20r%C5%AF%C5%BE%C3%AD.cho#L22) — Verse has no chords; an earlier verse of the same length has chords
+- [Samson - Už to nenapravím, line 6](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Samson%20-%20U%C5%BE%20to%20nenaprav%C3%ADm.cho#L6) — Repeated spaces between lyric characters
+- [Samson - Už to nenapravím, line 21](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Samson%20-%20U%C5%BE%20to%20nenaprav%C3%ADm.cho#L21) — Repeated spaces between lyric characters
+- [Samson - Už to nenapravím, line 37](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Samson%20-%20U%C5%BE%20to%20nenaprav%C3%ADm.cho#L37) — Repeated spaces between lyric characters
+- [Steve Earle - The Galway Girl, line 34](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Steve%20Earle%20-%20The%20Galway%20Girl.cho#L34) — Repeated spaces between lyric characters
+- [Steve Earle - The Galway Girl, line 40](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Steve%20Earle%20-%20The%20Galway%20Girl.cho#L40) — Repeated spaces between lyric characters
+- [Steve Earle - The Galway Girl, line 84](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Steve%20Earle%20-%20The%20Galway%20Girl.cho#L84) — Repeated spaces between lyric characters
 - [The Animals - The House of the Rising Sun, line 10](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/The%20Animals%20-%20The%20House%20of%20the%20Rising%20Sun.cho#L10) — Verse has no chords; an earlier verse of the same length has chords
 - [The Animals - The House of the Rising Sun, line 20](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/The%20Animals%20-%20The%20House%20of%20the%20Rising%20Sun.cho#L20) — Verse has no chords; an earlier verse of the same length has chords
 - [The Animals - The House of the Rising Sun, line 25](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/The%20Animals%20-%20The%20House%20of%20the%20Rising%20Sun.cho#L25) — Verse has no chords; an earlier verse of the same length has chords
@@ -103,7 +116,7 @@ Candidate lines: 140
 - [Traband - Orel & panna, line 14](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20Orel%20%26%20panna.cho#L14) — Verse has no chords; an earlier verse of the same length has chords
 - [Traband - Orel & panna, line 24](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20Orel%20%26%20panna.cho#L24) — Verse has no chords; an earlier verse of the same length has chords
 - [Traband - Pět prstů, line 9](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20P%C4%9Bt%20prst%C5%AF.cho#L9) — Verse has no chords; an earlier verse of the same length has chords
-- [Traband - Pět prstů, line 19](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20P%C4%9Bt%20prst%C5%AF.cho#L19) — Verse has no chords; an earlier verse of the same length has chords
+- [Traband - Pět prstů, line 20](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20P%C4%9Bt%20prst%C5%AF.cho#L20) — Verse has no chords; an earlier verse of the same length has chords
 - [Traband - Tak to mám rád, line 19](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20Tak%20to%20m%C3%A1m%20r%C3%A1d.cho#L19) — Verse has no chords; an earlier verse of the same length has chords
 - [Traband - Tichý muž, line 32](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20Tich%C3%BD%20mu%C5%BE.cho#L32) — Verse has no chords; an earlier verse of the same length has chords
 - [Traband - Trosečník, line 27](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20Trose%C4%8Dn%C3%ADk.cho#L27) — Verse has no chords; an earlier verse of the same length has chords
@@ -114,7 +127,6 @@ Candidate lines: 140
 - [Traband - Vetřelec, line 24](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20Vet%C5%99elec.cho#L24) — Verse has no chords; an earlier verse of the same length has chords
 - [Traband - Vetřelec, line 29](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20Vet%C5%99elec.cho#L29) — Verse has no chords; an earlier verse of the same length has chords
 - [Traband - Vetřelec, line 34](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20Vet%C5%99elec.cho#L34) — Verse has no chords; an earlier verse of the same length has chords
-- [Traband - Vetřelec, line 54](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20Vet%C5%99elec.cho#L54) — Verse has no chords; an earlier verse of the same length has chords
 - [Traband - Vraťte mi mou hlavu, line 10](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20Vra%C5%A5te%20mi%20mou%20hlavu.cho#L10) — Verse has no chords; an earlier verse of the same length has chords
 - [Traband - Vraťte mi mou hlavu, line 20](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20Vra%C5%A5te%20mi%20mou%20hlavu.cho#L20) — Verse has no chords; an earlier verse of the same length has chords
 - [Traband - Vraťte mi mou hlavu, line 25](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20Vra%C5%A5te%20mi%20mou%20hlavu.cho#L25) — Verse has no chords; an earlier verse of the same length has chords
@@ -122,17 +134,15 @@ Candidate lines: 140
 - [Traband - Žižkovská romance, line 9](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20%C5%BDi%C5%BEkovsk%C3%A1%20romance.cho#L9) — Verse has no chords; an earlier verse of the same length has chords
 - [Traband - Žižkovská romance, line 14](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20%C5%BDi%C5%BEkovsk%C3%A1%20romance.cho#L14) — Verse has no chords; an earlier verse of the same length has chords
 - [Traband - Žižkovská romance, line 22](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20%C5%BDi%C5%BEkovsk%C3%A1%20romance.cho#L22) — Verse has no chords; an earlier verse of the same length has chords
-- [Traband - Žižkovská romance, line 30](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Traband%20-%20%C5%BDi%C5%BEkovsk%C3%A1%20romance.cho#L30) — Verse has no chords; an earlier verse of the same length has chords
 - [Táborová klasika - Hej šup námořníci, line 23](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/T%C3%A1borov%C3%A1%20klasika%20-%20Hej%20%C5%A1up%20n%C3%A1mo%C5%99n%C3%ADci.cho#L23) — Verse has no chords; an earlier verse of the same length has chords
 - [Táborová klasika - Hledám děvče na neděli, line 20](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/T%C3%A1borov%C3%A1%20klasika%20-%20Hled%C3%A1m%20d%C4%9Bv%C4%8De%20na%20ned%C4%9Bli.cho#L20) — Verse has no chords; an earlier verse of the same length has chords
-- [Vladimír Mišík - Jednohubky, line 14](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Vladim%C3%ADr%20Mi%C5%A1%C3%ADk%20-%20Jednohubky.cho#L14) — Verse has no chords; an earlier verse of the same length has chords
-- [Vladimír Mišík - Jednohubky, line 24](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Vladim%C3%ADr%20Mi%C5%A1%C3%ADk%20-%20Jednohubky.cho#L24) — Verse has no chords; an earlier verse of the same length has chords
 - [Vladimír Mišík - Jednou, line 29](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Vladim%C3%ADr%20Mi%C5%A1%C3%ADk%20-%20Jednou.cho#L29) — Verse has no chords; an earlier verse of the same length has chords
 - [Václav Neckář - Andělé strážní, line 37](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/V%C3%A1clav%20Neck%C3%A1%C5%99%20-%20And%C4%9Bl%C3%A9%20str%C3%A1%C5%BEn%C3%AD.cho#L37) — Verse has no chords; an earlier verse of the same length has chords
 - [Wabi Daněk - Ročník 47, line 21](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Wabi%20Dan%C4%9Bk%20-%20Ro%C4%8Dn%C3%ADk%2047.cho#L21) — Verse has no chords; an earlier verse of the same length has chords
 - [Wabi Ryvola - Poslední weekend, line 11](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Wabi%20Ryvola%20-%20Posledn%C3%AD%20weekend.cho#L11) — Verse has no chords; an earlier verse of the same length has chords
 - [Wabi Ryvola - Poslední weekend, line 36](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Wabi%20Ryvola%20-%20Posledn%C3%AD%20weekend.cho#L36) — Verse has no chords; an earlier verse of the same length has chords
 - [Wabi Ryvola - Poslední weekend, line 43](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Wabi%20Ryvola%20-%20Posledn%C3%AD%20weekend.cho#L43) — Verse has no chords; an earlier verse of the same length has chords
+- [Wanastowi Vjecy - Sbírka zvadlejch růží, line 115](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Wanastowi%20Vjecy%20-%20Sb%C3%ADrka%20zvadlejch%20r%C5%AF%C5%BE%C3%AD.cho#L115) — Repeated spaces between lyric characters
 - [Xavier Baumaxa - Lidé Z Malých Vesniček, line 9](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Xavier%20Baumaxa%20-%20Lid%C3%A9%20Z%20Mal%C3%BDch%20Vesni%C4%8Dek.cho#L9) — Verse has no chords; an earlier verse of the same length has chords
 - [Záviš - Cukrářská, line 16](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Z%C3%A1vi%C5%A1%20-%20Cukr%C3%A1%C5%99sk%C3%A1.cho#L16) — Verse has no chords; an earlier verse of the same length has chords
 - [Záviš - Čepice, line 19](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/Z%C3%A1vi%C5%A1%20-%20%C4%8Cepice.cho#L19) — Verse has no chords; an earlier verse of the same length has chords
@@ -140,7 +150,4 @@ Candidate lines: 140
 - [Čechomor - Gorale, line 11](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/%C4%8Cechomor%20-%20Gorale.cho#L11) — Verse has no chords; an earlier verse of the same length has chords
 - [Čechomor - Gorale, line 14](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/%C4%8Cechomor%20-%20Gorale.cho#L14) — Verse has no chords; an earlier verse of the same length has chords
 - [Čechomor - Gorale, line 17](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/%C4%8Cechomor%20-%20Gorale.cho#L17) — Verse has no chords; an earlier verse of the same length has chords
-- [Čechomor - Proměny, line 32](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/%C4%8Cechomor%20-%20Prom%C4%9Bny.cho#L32) — Verse has no chords; an earlier verse of the same length has chords
-- [Čechomor - Proměny, line 36](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/%C4%8Cechomor%20-%20Prom%C4%9Bny.cho#L36) — Verse has no chords; an earlier verse of the same length has chords
-- [Čechomor - Proměny, line 40](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/%C4%8Cechomor%20-%20Prom%C4%9Bny.cho#L40) — Verse has no chords; an earlier verse of the same length has chords
 - [Čechomor - Tady jsem doma, line 40](https://github.com/krystofkomanec/zpevnik-kk/blob/main/ChordPro/%C4%8Cechomor%20-%20Tady%20jsem%20doma.cho#L40) — Verse has no chords; an earlier verse of the same length has chords
