@@ -8,6 +8,30 @@ function save(k,v){try{localStorage.setItem('zpevnik.'+k,v)}catch(e){}}
 function fold(s){s=s.toLowerCase();return s.normalize?s.normalize('NFD').replace(/[\u0300-\u036f]/g,''):s}
 var size=Math.min(40,Math.max(14,Number(get('text','21'))||21)),dark=get('dark','0')==='1',current,shift=0;
 songs.sort(function(a,b){return Number(!!b.cho)-Number(!!a.cho)||a.title.localeCompare(b.title,'cs')});
+var english = get('language','cs') === 'en';
+function t(cs,en){return english ? en : cs}
+function visible(song){return !english || song.lyricsLanguage === 'en'}
+function translatePage(){
+ document.documentElement.lang=t('cs','en');
+ document.title=t('Zpěvník KK','KK Songbook');
+ ['textContent','title','aria-label','placeholder'].forEach(function(attr){
+  var key=attr==='textContent'?'data-en':'data-en-'+attr;
+  var nodes=document.querySelectorAll('['+key+']');
+  for(var i=0;i<nodes.length;i++){
+   var node=nodes[i],text=attr==='textContent',cs=key.replace('data-en','data-cs');
+   if(!node.hasAttribute(cs))node.setAttribute(cs,text?node.textContent:node.getAttribute(attr));
+   var value=node.getAttribute(english?key:cs);
+   if(text)node.textContent=value;else node.setAttribute(attr,value);
+  }
+ });
+ el('language').textContent=t('English','Čeština');
+ el('language').lang=t('en','cs');
+}
+el('language').onclick=function(){
+ english=!english;save('language',english?'en':'cs');translatePage();
+ if(!visible(current)){current=songs.filter(visible)[0];shift=0}
+ list();render();updateOverview();refreshUsage();
+};
 function theme(){document.body.classList.toggle('dark',dark);el('theme').textContent=dark?'☾':'☀';el('theme').setAttribute('aria-pressed',String(dark));save('dark',dark?'1':'0')}
 el('theme').onclick=function(){dark=!dark;theme()};
 el('toggle').onclick=function(){
@@ -44,6 +68,11 @@ function openedAt(timestamp){
 }
 function showUsage(){
  var data=events(),counts=Object.create(null),pdfs=el('pdf-log'),rank=el('file-counts');
+ if(english){
+  var names=Object.create(null);
+  songs.filter(visible).forEach(function(s){names[[s.artist,s.title].filter(Boolean).join(' - ')]=true});
+  data=data.filter(function(r){return names[r.name]});
+ }
  clear(pdfs);clear(rank);
  data.forEach(function(r){
   var id=r.kind+'|'+r.name;
@@ -57,9 +86,9 @@ function showUsage(){
  var ids=Object.keys(counts).sort(function(a,b){return counts[b].n-counts[a].n||counts[b].record.time-counts[a].record.time});
  ids.forEach(function(id){
   var entry=counts[id],item=make('li'),label=make('span',entry.record.name);
-  label.appendChild(make('small','Naposledy otevřeno: '+openedAt(entry.record.time)));item.appendChild(label);item.appendChild(make('strong',entry.n+'×'));rank.appendChild(item);
+  label.appendChild(make('small',t('Naposledy otevřeno: ','Last opened: ')+openedAt(entry.record.time)));item.appendChild(label);item.appendChild(make('strong',entry.n+'×'));rank.appendChild(item);
  });
- el('usage-total').textContent='Celkem otevření: '+data.length+' · Různých souborů: '+ids.length;
+ el('usage-total').textContent=t('Celkem otevření: ','Total opens: ')+data.length+t(' · Různých souborů: ',' · Distinct files: ')+ids.length;
  el('no-pdf').hidden=pdfs.children.length>0;el('reset-usage').disabled=!data.length;
  el('storage-warning').hidden=storageAvailable;
 }
@@ -69,7 +98,7 @@ el('usage').onclick=function(){
  if(!panel.hidden)showUsage();
 };
 el('reset-usage').onclick=function(){
- if(!window.confirm('Vymazat historii otevření i statistiky v tomto prohlížeči?'))return;
+ if(!window.confirm(t('Vymazat historii otevření i statistiky v tomto prohlížeči?','Clear all opening history and statistics in this browser?')))return;
  try{
   var keys=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf(eventPrefix)===0)keys.push(k)}
   keys.forEach(function(k){localStorage.removeItem(k)});
@@ -79,7 +108,7 @@ el('reset-usage').onclick=function(){
 function refreshUsage(){if(!el('usage-panel').hidden)showUsage()}
 window.addEventListener('pageshow',refreshUsage);window.addEventListener('storage',refreshUsage);
 function list(){var box=el('list'),q=fold(el('search').value),count=0;clear(box);
- songs.forEach(function(s){if(fold(s.title+' '+s.artist).indexOf(q)<0)return;var b=make('button',s.title,'item');b.appendChild(make('small',[s.artist].filter(Boolean).join(' · ')));b.setAttribute('aria-current',s===current?'true':'false');b.onclick=function(){openSong(s)};box.appendChild(b);count++});el('count').textContent=count+' položek';}
+ songs.forEach(function(s){if(!visible(s)||fold(s.title+' '+s.artist).indexOf(q)<0)return;var b=make('button',s.title,'item');b.appendChild(make('small',[s.artist].filter(Boolean).join(' · ')));b.setAttribute('aria-current',s===current?'true':'false');b.onclick=function(){openSong(s)};box.appendChild(b);count++});el('count').textContent=count+t(' položek',count===1?' song':' songs');}
 function openSong(s,initial){
  if(!initial)recordOpen(s,'ChordPro');
  current=s;shift=0;document.body.classList.remove('browse');list();render();window.scrollTo(0,0)}
@@ -122,12 +151,17 @@ function drawLine(line,lang,seen){
  });
  return row;
 }
-function render(){var s=current,score=el('score'),ch=[];clear(score);el('title').textContent=s.title;el('artist').textContent=[s.artist,s.kind].filter(Boolean).join(' · ');el('status').textContent=s.note||'';el('chords').textContent='';el('cap').textContent='';el('tools').style.display=s.cho?'flex':'none';score.style.fontSize=size+'px';
+function songLabel(value){
+ if(!english || !value)return value;
+ var labels={'Text s akordy':'Lyrics and chords','Text bez akordů':'Lyrics only','Akordový doprovod':'Chord accompaniment','Refrén':'Chorus','Sloka':'Verse','Mezihra':'Interlude','PDF uvádí 3. pražec, původní název souboru uvádí 2.':'The PDF specifies fret 3; the original filename specifies fret 2.','Umístění doplněných akordů ve slokách je odvozené podle předchozí sloky.':'Added verse chord positions follow the preceding verse.'};
+ return labels[value] || value.replace(/^(\d+)\. sloka$/i,'Verse $1');
+}
+function render(){var s=current,score=el('score'),ch=[];clear(score);el('title').textContent=s.title;el('artist').textContent=[s.artist,songLabel(s.kind)].filter(Boolean).join(' · ');el('status').textContent=songLabel(s.note)||'';el('chords').textContent='';el('cap').textContent='';el('tools').style.display=s.cho?'flex':'none';score.style.fontSize=size+'px';
  var harmonicas=['C','','D','','E','F','','G','','A','','H'];
  var harp=typeof s.minor==='number'?harmonicas[(s.minor+shift+15)%12]:'';
- el('harp').textContent=harp?'Foukací harmonika · '+harp+' dur (4. poloha)':'';
+ el('harp').textContent=harp?t('Foukací harmonika · ','Harmonica · ')+harp+t(' dur (4. poloha)',' major (4th position)'):'';
  el('harp').hidden=!harp;
- if(s.cho){var c=meta(s.cho,'capo');if(/^\d+$/.test(c)&&+c>0)el('cap').textContent='Kapodastr · '+c+'. pražec';
+ if(s.cho){var c=meta(s.cho,'capo');if(/^\d+$/.test(c)&&+c>0)el('cap').textContent=t('Kapodastr · '+c+'. pražec','Capo · fret '+c);
  var rows=s.cho.split(/\r?\n/), verseLabel=false;
  rows.forEach(function(line,i){
   if(!line.trim()||/^\s*#/.test(line))return;
@@ -136,7 +170,7 @@ function render(){var s=current,score=el('score'),ch=[];clear(score);el('title')
    var lbl={start_of_chorus:'Refrén',soc:'Refrén',start_of_verse:'Sloka',sov:'Sloka',start_of_bridge:'Mezihra'};
    if(d[1]==='comment'||d[1]==='c'||lbl[d[1]]){
     var heading=d[2]||lbl[d[1]]||'';verseLabel=/sloka|verse/i.test(heading);
-    score.appendChild(make('div',heading,'section'));
+    score.appendChild(make('div',songLabel(heading),'section'));
    }
    return;
   }
@@ -153,10 +187,11 @@ el('search').oninput=list;
 function updateOverview(){
  var query=fold(el('catalog-search').value),box=el('catalog-list'),count=0;clear(box);
  catalog.forEach(function(r){
+  if(!visible(r))return;
   if(query&&fold([r.name,r.artist,r.title].join(' ')).indexOf(query)<0)return;
   var item=make('li');item.appendChild(make('strong',r.name));box.appendChild(item);count++;
  });
- el('catalog-count').textContent='Počet skladeb: '+count;
+ el('catalog-count').textContent=t('Počet skladeb: ','Songs: ')+count;
 }
 el('catalog-toggle').onclick=function(){
  var panel=el('catalog-panel');panel.hidden=!panel.hidden;el('catalog-toggle').setAttribute('aria-expanded',String(!panel.hidden));if(!panel.hidden)updateOverview();
@@ -165,5 +200,5 @@ el('catalog-search').oninput=updateOverview;
 function resize(d){size=Math.max(14,Math.min(40,size+d));save('text',size);render()}
 el('small').onclick=function(){resize(-2)};el('big').onclick=function(){resize(2)};
 el('up').onclick=function(){shift=Math.min(12,shift+1);render()};el('down').onclick=function(){shift=Math.max(-12,shift-1);render()};el('pitch').onclick=function(){shift=0;render()};
-theme();openSong(songs.filter(function(s){return s.title==='Runaway'})[0],true);
+translatePage();theme();openSong(songs.filter(function(s){return s.title==='Runaway'})[0],true);
 })();
