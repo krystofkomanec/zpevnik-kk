@@ -51,7 +51,7 @@ article{padding:36px 4.5%}.song-head{padding:0 0 16px}.meta,.dark .meta{font-wei
 @media (orientation:landscape) and (min-width:700px){.playing #score{column-count:2}}
 #capo-fret{font:inherit;color:var(--ink);background:var(--surface);border:0;border-radius:6px;padding:5px;min-height:32px}</style>
 <header><div class="brand"><button id="toggle" type="button" aria-label="Menu knihovny" data-en-aria-label="Library menu" aria-controls="library" aria-expanded="false"><span class="bars"></span></button><b data-en="KK Songbook">Zpěvník KK</b></div><div><button id="language" type="button"></button> <button id="theme" title="Tmavý režim" data-en-title="Dark mode" aria-label="Tmavý režim" data-en-aria-label="Dark mode" aria-pressed="false">☀</button></div></header>
-<main><aside id="library"><div class="library-title"><h2 data-en="Library">Knihovna</h2><p id="count"></p></div><input type="search" id="search" placeholder="Skladba nebo interpret" data-en-placeholder="Song or artist" aria-label="Hledat" data-en-aria-label="Search"><details id="library-tools"><summary data-en="Library tools">Nástroje knihovny</summary><div class="actions"><button id="export-notes">Export připomínek</button><a href="https://github.com/krystofkomanec/zpevnik-kk/upload/main/inbox" target="_blank" rel="noopener" data-en="Upload a PDF">Nahrát PDF</a><button id="check-library" data-en="Check for updates">Zkontrolovat aktuálnost</button><button id="update-library" hidden data-en="Load latest songs">Nahrát nejnovější data</button>
+<main><aside id="library"><div class="library-title"><h2 data-en="Library">Knihovna</h2><p id="count"></p></div><input type="search" id="search" placeholder="Skladba nebo interpret" data-en-placeholder="Song or artist" aria-label="Hledat" data-en-aria-label="Search"><details id="library-tools"><summary data-en="Library tools">Nástroje knihovny</summary><div class="actions"><button id="export-settings" data-en="Export song settings">Exportovat nastavení skladeb</button><button id="import-settings" data-en="Import song settings">Importovat nastavení skladeb</button><input id="settings-file" type="file" accept=".json,application/json" hidden><p id="settings-status" role="status" hidden></p><button id="export-notes">Export připomínek</button><a href="https://github.com/krystofkomanec/zpevnik-kk/upload/main/inbox" target="_blank" rel="noopener" data-en="Upload a PDF">Nahrát PDF</a><button id="check-library" data-en="Check for updates">Zkontrolovat aktuálnost</button><button id="update-library" hidden data-en="Load latest songs">Nahrát nejnovější data</button>
 <p id="update-status" role="status" hidden></p>
 <div id="update-fallback" hidden><details id="private-access"><summary data-en="Private repository access">Přístup k soukromému repozitáři</summary><label><span data-en="Read-only GitHub token (this session only)">GitHub token pro čtení (jen pro toto otevření)</span> <input id="library-token" type="password" autocomplete="off" spellcheck="false"></label> <button id="private-update" data-en="Load songs">Načíst skladby</button></details><a href="https://github.com/krystofkomanec/zpevnik-kk/releases/latest/download/library.json" target="_blank" rel="noopener" data-en="Download library.json">Stáhnout library.json</a> · <label><span data-en="Load downloaded file">Načíst stažený soubor</span> <input id="update-file" type="file" accept=".json,application/json"></label></div>
 </div></details><div id="list"></div></aside>
@@ -434,10 +434,75 @@ function reportCount(){
  try{var n=reports().length;button.disabled=!n;button.textContent=t('Export připomínek','Export reports')+' ('+n+')'}
  catch(error){button.disabled=true}
 }
-el('export-notes').onclick=function(){
- var url=URL.createObjectURL(new Blob([JSON.stringify(reports(),null,2)],{type:'application/json'}));
- var link=make('a');link.download='songbook-reports.json';link.href=url;document.body.appendChild(link);link.click();link.remove();
+function downloadJson(filename,data){
+ var url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+ var link=make('a');link.download=filename;link.href=url;document.body.appendChild(link);link.click();link.remove();
  setTimeout(function(){URL.revokeObjectURL(url)},30000);
+}
+el('export-notes').onclick=function(){downloadJson('songbook-reports.json',reports())};
+function settingsMessage(message){
+ var status=el('settings-status');status.hidden=false;status.textContent=message;
+}
+function validSetting(kind,n){
+ return typeof n==='number' && Math.floor(n)===n && n<=12 && n>=(kind==='pitch'?-12:0);
+}
+el('export-settings').onclick=function(){
+ try{
+  var entries=Object.create(null);
+  for(var i=0;i<localStorage.length;i++){
+   var key=localStorage.key(i),match=/^zpevnik\.(capo|pitch)\.(.+)$/.exec(key);
+   if(!match)continue;
+   var raw=localStorage.getItem(key),n=Number(raw);
+   if(raw!==String(n)||!validSetting(match[1],n))throw Error();
+   var file=match[2];
+   if(!entries[file])entries[file]={};
+   entries[file][match[1]]=n;
+  }
+  downloadJson('songbook-settings.json',{format:'kk-songbook-settings',version:1,songs:entries});
+  settingsMessage(t('Exportováno skladeb: ','Songs exported: ')+Object.keys(entries).length);
+ }catch(error){settingsMessage(t('Nastavení se nepodařilo exportovat.','Could not export settings.'))}
+};
+function importSettings(data){
+ if(!data || data.format!=='kk-songbook-settings' || data.version!==1 || !data.songs ||
+    typeof data.songs!=='object' || Array.isArray(data.songs))throw Error();
+ var files=Object.keys(data.songs),changes=[];
+ files.forEach(function(file){
+  var entry=data.songs[file];
+  if(!file || !entry || typeof entry!=='object' || Array.isArray(entry) || !Object.keys(entry).length)throw Error();
+  Object.keys(entry).forEach(function(kind){
+   if((kind!=='pitch' && kind!=='capo') || !validSetting(kind,entry[kind]))throw Error();
+   var key='zpevnik.'+kind+'.'+file;
+   changes.push({key:key,value:String(entry[kind]),previous:localStorage.getItem(key)});
+  });
+ });
+ var written=0;
+ try{
+  for(;written<changes.length;written++)localStorage.setItem(changes[written].key,changes[written].value);
+ }catch(error){
+  while(written){
+   var old=changes[--written];
+   if(old.previous===null)localStorage.removeItem(old.key);else localStorage.setItem(old.key,old.previous);
+  }
+  throw error;
+ }
+ var active=data.songs[current.file];
+ if(active){
+  if(active.pitch!==undefined)shift=active.pitch;
+  render();
+ }
+ return files.length;
+}
+el('import-settings').onclick=function(){el('settings-file').click()};
+el('settings-file').onchange=function(){
+ var file=this.files[0];if(!file)return;
+ this.value='';
+ var reader=new FileReader();
+ function failed(){settingsMessage(t('Import se nezdařil. Vyber soubor s exportovaným nastavením skladeb.','Import failed. Choose a song settings backup.'))}
+ reader.onload=function(){
+  try{var count=importSettings(JSON.parse(reader.result));settingsMessage(t('Importováno skladeb: ','Songs imported: ')+count)}
+  catch(error){failed()}
+ };
+ reader.onerror=failed;reader.readAsText(file);
 };
 function reportRow(target){
  var row=target.closest('.line');if(!row)return null;

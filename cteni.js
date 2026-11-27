@@ -369,10 +369,75 @@ function reportCount(){
  try{var n=reports().length;button.disabled=!n;button.textContent=t('Export připomínek','Export reports')+' ('+n+')'}
  catch(error){button.disabled=true}
 }
-el('export-notes').onclick=function(){
- var url=URL.createObjectURL(new Blob([JSON.stringify(reports(),null,2)],{type:'application/json'}));
- var link=make('a');link.download='songbook-reports.json';link.href=url;document.body.appendChild(link);link.click();link.remove();
+function downloadJson(filename,data){
+ var url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+ var link=make('a');link.download=filename;link.href=url;document.body.appendChild(link);link.click();link.remove();
  setTimeout(function(){URL.revokeObjectURL(url)},30000);
+}
+el('export-notes').onclick=function(){downloadJson('songbook-reports.json',reports())};
+function settingsMessage(message){
+ var status=el('settings-status');status.hidden=false;status.textContent=message;
+}
+function validSetting(kind,n){
+ return typeof n==='number' && Math.floor(n)===n && n<=12 && n>=(kind==='pitch'?-12:0);
+}
+el('export-settings').onclick=function(){
+ try{
+  var entries=Object.create(null);
+  for(var i=0;i<localStorage.length;i++){
+   var key=localStorage.key(i),match=/^zpevnik\.(capo|pitch)\.(.+)$/.exec(key);
+   if(!match)continue;
+   var raw=localStorage.getItem(key),n=Number(raw);
+   if(raw!==String(n)||!validSetting(match[1],n))throw Error();
+   var file=match[2];
+   if(!entries[file])entries[file]={};
+   entries[file][match[1]]=n;
+  }
+  downloadJson('songbook-settings.json',{format:'kk-songbook-settings',version:1,songs:entries});
+  settingsMessage(t('Exportováno skladeb: ','Songs exported: ')+Object.keys(entries).length);
+ }catch(error){settingsMessage(t('Nastavení se nepodařilo exportovat.','Could not export settings.'))}
+};
+function importSettings(data){
+ if(!data || data.format!=='kk-songbook-settings' || data.version!==1 || !data.songs ||
+    typeof data.songs!=='object' || Array.isArray(data.songs))throw Error();
+ var files=Object.keys(data.songs),changes=[];
+ files.forEach(function(file){
+  var entry=data.songs[file];
+  if(!file || !entry || typeof entry!=='object' || Array.isArray(entry) || !Object.keys(entry).length)throw Error();
+  Object.keys(entry).forEach(function(kind){
+   if((kind!=='pitch' && kind!=='capo') || !validSetting(kind,entry[kind]))throw Error();
+   var key='zpevnik.'+kind+'.'+file;
+   changes.push({key:key,value:String(entry[kind]),previous:localStorage.getItem(key)});
+  });
+ });
+ var written=0;
+ try{
+  for(;written<changes.length;written++)localStorage.setItem(changes[written].key,changes[written].value);
+ }catch(error){
+  while(written){
+   var old=changes[--written];
+   if(old.previous===null)localStorage.removeItem(old.key);else localStorage.setItem(old.key,old.previous);
+  }
+  throw error;
+ }
+ var active=data.songs[current.file];
+ if(active){
+  if(active.pitch!==undefined)shift=active.pitch;
+  render();
+ }
+ return files.length;
+}
+el('import-settings').onclick=function(){el('settings-file').click()};
+el('settings-file').onchange=function(){
+ var file=this.files[0];if(!file)return;
+ this.value='';
+ var reader=new FileReader();
+ function failed(){settingsMessage(t('Import se nezdařil. Vyber soubor s exportovaným nastavením skladeb.','Import failed. Choose a song settings backup.'))}
+ reader.onload=function(){
+  try{var count=importSettings(JSON.parse(reader.result));settingsMessage(t('Importováno skladeb: ','Songs imported: ')+count)}
+  catch(error){failed()}
+ };
+ reader.onerror=failed;reader.readAsText(file);
 };
 function reportRow(target){
  var row=target.closest('.line');if(!row)return null;

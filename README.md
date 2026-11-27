@@ -14,6 +14,10 @@ Long-press a line, right-click it, or focus it and press Enter to report a missi
 
 The [automatic arrangement checks](./ARRANGEMENT-CHECKS.md) run on every publication and link directly to lines that may need a correction.
 
+## Moving song settings between devices
+
+Under **Library tools**, choose **Export song settings**. Copy the downloaded JSON file to your other device and choose **Import song settings** there. This works offline. The backup includes saved capo frets and transpositions. Import merges settings per song: values in the file take precedence, and other saved values stay in place.
+
 ## Updating your library
 
 Open **Library tools** and select **Check for updates** while online. The check compares your local data version with a small version file. If a newer library is available, select **Load latest songs**. The browser keeps the update for offline use. If direct loading is unavailable, follow the download link shown in the app and select the downloaded `library.json`. To update the app itself, download the latest HTML file above.
