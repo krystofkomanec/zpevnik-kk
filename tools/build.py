@@ -19,12 +19,27 @@ def load(path, default):
     return json.loads(path.read_text()) if path.exists() else default
 
 
+# Compare lyric words only. Unknown and instrumental sheets stay in the full library.
+def lyrics_language(chordpro):
+    lyrics = re.sub(r'(?m)^\s*#.*$|\{[^}]*\}|\[[^\]]*\]', '', chordpro.lower())
+    words = set(re.findall(r'[^\W\d_]+', lyrics))
+    english = set("the you your yours i i'm my me mine is are it it's was were be been being of to through they them he she we us our their in on by with as but when where why what how this that these those all will would could should said have has had only know day night heart love never always and for from who take can don't just not".split())
+    czech = set("já ty mě mně můj má moje mi se si jsme jsem jsi jsou být byl byla když jak kde kdo co že už tě tebe jeho její tak aby ale jen až na za do od pro při bez pod nad ten ta tohle který které mám máš víš proč kde zas není jako stále tvůj tvá svůj nebo pak než nás vás jí nic však jenom".split())
+    en_score = len(words & english)
+    cs_score = len(words & czech) + min(4, sum(bool(re.search('[ěščřžýáíéúůťďň]', w)) for w in words))
+    if en_score >= 2 and en_score > cs_score:
+        return 'en'
+    if cs_score >= 2 and cs_score > en_score:
+        return 'cs'
+    return 'und'
+
+
 def build():
     library = ROOT/'knihovna.js'
     source, overview = library.read_text().strip().removesuffix(';').split(';\nvar catalog=')
     songs = json.loads(source.removeprefix('var songs='))
     catalog = [entry for entry in json.loads(overview) if 'inbox' not in entry]
-    state_path = ROOT/'inbox/imports.json'
+    state_path = ROOT/'tools/imports.json'
     state = load(state_path, {})
     by_file = {s['file']:s for s in songs}
     for path in sorted((ROOT/'inbox').rglob('*')):
@@ -37,10 +52,10 @@ def build():
         if entry.get('sha256') == digest and entry.get('file') in by_file:
             continue
         artist, sep, title = name.partition(' - ')
-        language = path.parent.name
+        language = 'und'
         try:
-            if not sep or not artist.strip() or not title.strip() or language not in ('cs','en'):
-                raise ValueError('Use inbox/en or inbox/cs and name the file Artist - Title.pdf')
+            if not sep or not artist.strip() or not title.strip():
+                raise ValueError('Use inbox and name the file Artist - Title.pdf')
             if any(c in name for c in '{}\r\n'):
                 raise ValueError('Unsupported characters in filename')
             file = name+'.cho'
@@ -50,8 +65,11 @@ def build():
             if entry.get('file') and not entry.get('generated'):
                 raise ValueError('Revised source for a manually edited arrangement; review before replacing')
             cho = convert(path,artist,title)
+            language = lyrics_language(cho)
+            symbols = re.findall(r'\[([^\]]+)\]',cho)
+            czech_notes = any(re.match(r'^H|^[A-H](?:is|es|[#b])?mi(?!n)', c) for c in symbols)
             target.write_text(cho)
-            song = dict(title=title,artist=artist,file=file,lang='en' if language=='en' else 'cz',cho=cho,lyricsLanguage=language)
+            song = dict(title=title,artist=artist,file=file,lang='cz' if czech_notes or language=='cs' else 'en',cho=cho,lyricsLanguage=language)
             by_file[file]=song
             state[key]={'sha256':digest,'file':file,'generated':True}
         except (ValueError,subprocess.CalledProcessError) as error:
