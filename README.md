@@ -8,6 +8,12 @@ Open the downloaded `index.html` in your browser on a tablet, phone, or computer
 
 Search the library by song title or artist. On smaller screens, the menu button opens the library. Expand **Guitar chords** to see six-string chord shapes, including open and muted strings. Use the song controls to transpose or resize the text. The header lets you switch appearance and language. **English** shows songs with English lyrics, while **Čeština** shows the full collection. Both modes use Czech chord names (H and B).
 
+Select **Play mode** to hide the controls. Landscape screens at least 700 pixels wide display two columns. Tap the screen edges or use the arrow keys to turn pages. Choose **Save** beside the transposition controls to remember the displayed offset for this song. Clicking the checked button clears it.
+
+Long-press a line, right-click it, or focus it and press Enter to report a missing chord, a misplaced chord, or incorrect lyrics. Reports stay in this browser until you export them together from **Library tools → Export reports**. Send the exported JSON to share your corrections.
+
+The [automatic arrangement checks](./ARRANGEMENT-CHECKS.md) run on every publication and link directly to lines that may need a correction.
+
 ## Updating your library
 
 Open **Library tools** and select **Check for updates** while online. The check compares your local data version with a small version file. If a newer library is available, select **Load latest songs**. The browser keeps the update for offline use. If direct loading is unavailable, follow the download link shown in the app and select the downloaded `library.json`. To update the app itself, download the latest HTML file above.

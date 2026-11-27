@@ -25,11 +25,11 @@ function translatePage(){
   }
  });
  el('language').textContent=t('English','Čeština');
- el('language').lang=t('en','cs');
+ el('language').lang=t('en','cs');reportCount();
 }
 el('language').onclick=function(){
  english=!english;save('language',english?'en':'cs');translatePage();
- if(!visible(current)){current=songs.filter(visible)[0];shift=0}
+ if(!visible(current)){current=songs.filter(visible)[0];shift=storedPitch()||0}
  list();render();
 };
 function theme(){document.body.classList.toggle('dark',dark);el('theme').textContent=dark?'☾':'☀';el('theme').setAttribute('aria-pressed',String(dark));save('dark',dark?'1':'0')}
@@ -41,7 +41,7 @@ el('toggle').onclick=function(){
 function list(){var box=el('list'),q=fold(el('search').value),count=0;clear(box);
  songs.forEach(function(s){if(!visible(s)||fold(s.title+' '+s.artist).indexOf(q)<0)return;var b=make('button',s.title,'item');b.appendChild(make('small',[s.artist].filter(Boolean).join(' · ')));b.setAttribute('aria-current',s===current?'true':'false');b.onclick=function(){openSong(s)};box.appendChild(b);count++});el('count').textContent=count+t(' položek',count===1?' song':' songs');}
 function openSong(s){
- current=s;shift=0;document.body.classList.remove('browse');el('toggle').setAttribute('aria-expanded','false');list();render();window.scrollTo(0,0)}
+ current=s;shift=storedPitch()||0;document.body.classList.remove('browse');el('toggle').setAttribute('aria-expanded','false');list();render();window.scrollTo(0,0)}
 function note(n,lang){
  var m=/^([A-H])(is|es|s(?!us)|#|b|♭|♯)?$/.exec(n);if(!m)return null;
  var p={C:0,D:2,E:4,F:5,G:7,A:9,B:lang==='cz'&&!m[2]?10:11,H:11}[m[1]];
@@ -176,22 +176,23 @@ function render(){var s=current,score=el('score'),ch=[];clear(score);el('title')
  el('harp').textContent=harp?t('Foukací harmonika · ','Harmonica · ')+harp+t(' dur (4. poloha)',' major (4th position)'):'';
  el('harp').hidden=!harp;
  if(s.cho){var c=meta(s.cho,'capo');if(/^\d+$/.test(c)&&+c>0)el('cap').textContent=t('Kapodastr · '+c+'. pražec','Capo · fret '+c);
- var rows=s.cho.split(/\r?\n/), verseLabel=false;
+ var rows=s.cho.split(/\r?\n/), verseLabel=false,sectionName='';
  rows.forEach(function(line,i){
   if(!line.trim()||/^\s*#/.test(line))return;
   var d=directive(line);
   if(d){
    var lbl={start_of_chorus:'Refrén',soc:'Refrén',start_of_verse:'Sloka',sov:'Sloka',start_of_bridge:'Mezihra'};
    if(d[1]==='comment'||d[1]==='c'||lbl[d[1]]){
-    var heading=d[2]||lbl[d[1]]||'';verseLabel=/sloka|verse/i.test(heading);
+    var heading=d[2]||lbl[d[1]]||'';sectionName=heading;verseLabel=/sloka|verse/i.test(heading);
     score.appendChild(make('div',songLabel(heading),'section'));
    }
    return;
   }
   var row=drawLine(line,s.lang||'en',ch),next=rows[i+1]||'';
+  row.dataset.sourceLine=i;row.dataset.section=sectionName;row.tabIndex=0;
   if(verseLabel && /^\s*(?:\[[^\]]+\]\s*)+$/.test(line) && next.trim() && !/[{}\[\]]/.test(next) && !/^\s*#/.test(next)){
    row.className+=' progression';
-   row.appendChild(make('div',next.trim(),'progression-text'));
+   var lyric=make('div',next.trim(),'progression-text');lyric.dataset.sourceLine=i+1;lyric.dataset.section=sectionName;lyric.tabIndex=0;row.appendChild(lyric);
   }else if(i && score.lastChild && score.lastChild.classList.contains('progression') && /^\s*(?:\[[^\]]+\]\s*)+$/.test(rows[i-1]))return;
   // Respect stanza breaks between sung lines without detaching a chord-only line.
   if(i && !rows[i-1].trim() && score.lastChild && score.lastChild.classList.contains('line')){
@@ -202,8 +203,134 @@ function render(){var s=current,score=el('score'),ch=[];clear(score);el('title')
   }
   score.appendChild(row);
  });
- chartSymbols=ch;el('guitar').hidden=!ch.length;el('chords').textContent=ch.join(' · ');showCharts();el('pitch').textContent=(shift>0?'+':'')+shift;el('small').disabled=size<=14;el('big').disabled=size>=40;el('down').disabled=shift<=-12;el('up').disabled=shift>=12}
+ groupStanzas(score);markReports(score);pitchState();chartSymbols=ch;el('guitar').hidden=!ch.length;el('chords').textContent=ch.join(' · ');showCharts();el('pitch').textContent=(shift>0?'+':'')+shift;el('small').disabled=size<=14;el('big').disabled=size>=40;el('down').disabled=shift<=-12;el('up').disabled=shift>=12}
 }
+function storedPitch(){
+ var value=get('pitch.'+current.file,null);
+ return value!==null && /^-?\d+$/.test(value) && Math.abs(Number(value))<=12?Number(value):null;
+}
+function pitchText(n){return (n>0?'+':'')+n}
+function pitchState(){
+ var saved=storedPitch(),button=el('save-pitch'),matches=saved===shift;
+ button.setAttribute('aria-pressed',String(matches));
+ button.textContent=matches?t('✓ Uloženo ','✓ Saved ')+pitchText(saved):t('Uložit ','Save ')+pitchText(shift);
+ el('saved-pitch').textContent=saved===null?t('Neuloženo','Not saved'):matches?'':t('Uloženo ','Saved ')+pitchText(saved);
+ button.title=matches?t('Zrušit uložení tóniny','Forget saved key'):t('Uložit pro tuto skladbu','Remember for this song');
+}
+el('save-pitch').onclick=function(){
+ try{
+  var key='zpevnik.pitch.'+current.file;
+  if(storedPitch()===shift)localStorage.removeItem(key);else localStorage.setItem(key,String(shift));
+  pitchState();
+ }catch(error){el('saved-pitch').textContent=t('Nelze uložit','Could not save')}
+};
+function playMode(on){
+ document.body.classList.toggle('playing',on);
+ el('play').setAttribute('aria-pressed',String(on));
+ el('play').textContent=on?t('Zavřít hraní','Exit play mode'):t('Režim hraní','Play mode');
+ el('score').scrollLeft=0;el('playing-title').textContent=current.title;
+ if(on)el('exit-play').focus();
+ window.scrollTo(0,0);
+}
+el('play').onclick=function(){playMode(!document.body.classList.contains('playing'))};
+el('exit-play').onclick=function(){playMode(false);el('play').focus()};
+function turnPage(direction){
+ var area=el('score');
+ area.scrollLeft+=direction*(area.clientWidth+24);
+}
+el('prev-page').onclick=function(){turnPage(-1)};
+el('next-page').onclick=function(){turnPage(1)};
+function groupStanzas(score){
+ var nodes=Array.prototype.slice.call(score.children),group=null,number=0;
+ nodes.forEach(function(row){
+  if(!group||row.classList.contains('section')||row.style.marginTop){
+   group=make('div',undefined,'stanza-block');group.dataset.block=++number;score.appendChild(group);
+  }
+  group.appendChild(row);
+ });
+}
+var notePrefix='zpevnik.line-note.',selectedLine=null,triggerRow=null;
+function openReport(row){
+ if(!row)return;
+ var index=Number(row.dataset.sourceLine),lines=current.cho.split(/\r?\n/);
+ selectedLine={song:current.title,artist:current.artist,file:current.file,revision:current.revision||1,
+  libraryVersion:libraryVersion,line:index+1,section:row.dataset.section||'',block:Number(row.closest('.stanza-block').dataset.block),source:lines[index],displayShift:shift};
+ triggerRow=row;
+ el('report-context').textContent=[current.title,selectedLine.section||t('Blok ','Block ')+selectedLine.block,t('řádek ','line ')+(index+1)].filter(Boolean).join(' · ');
+ el('report-text').textContent=lines[index];el('report-detail').value='';el('report-error').textContent='';
+ el('report-overlay').hidden=false;el('report-kind').focus();
+}
+function closeReport(){
+ el('report-overlay').hidden=true;selectedLine=null;
+ if(triggerRow){triggerRow.focus();triggerRow=null}
+}
+el('report-cancel').onclick=closeReport;
+el('report-form').onsubmit=function(event){
+ event.preventDefault();if(!selectedLine)return;
+ var record=selectedLine;record.type=el('report-kind').value;record.detail=el('report-detail').value;record.created=new Date().toISOString();
+ try{localStorage.setItem(notePrefix+Date.now()+'.'+Math.random().toString(36).slice(2),JSON.stringify(record))}
+ catch(error){el('report-error').textContent=t('Připomínku se nepodařilo uložit.','Could not save this report.');return}
+ triggerRow.classList.add('reported');closeReport();reportCount();
+};
+function reports(){
+ var items=[];
+ for(var i=0;i<localStorage.length;i++){
+  var key=localStorage.key(i);if(key && key.indexOf(notePrefix)===0)items.push(JSON.parse(localStorage.getItem(key)));
+ }
+ return items.sort(function(a,b){return a.created.localeCompare(b.created)});
+}
+function markReports(score){
+ try{
+  reports().forEach(function(r){
+   if(r.file!==current.file || r.revision!==(current.revision||1) || !Number.isInteger(r.line))return;
+   var row=score.querySelector('[data-source-line="'+(r.line-1)+'"]');
+   if(row)row.classList.add('reported');
+  });
+ }catch(ignore){}
+}
+function reportCount(){
+ var button=el('export-notes');
+ try{var n=reports().length;button.disabled=!n;button.textContent=t('Export připomínek','Export reports')+' ('+n+')'}
+ catch(error){button.disabled=true}
+}
+el('export-notes').onclick=function(){
+ var url=URL.createObjectURL(new Blob([JSON.stringify(reports(),null,2)],{type:'application/json'}));
+ var link=make('a');link.download='songbook-reports.json';link.href=url;document.body.appendChild(link);link.click();link.remove();
+ setTimeout(function(){URL.revokeObjectURL(url)},30000);
+};
+function reportRow(target){
+ var row=target.closest('.line');if(!row)return null;
+ if(target.closest('.progression-text'))return target.closest('.progression-text');
+ return row;
+}
+var holdTimer,holdX,holdY;
+function cancelHold(){clearTimeout(holdTimer)}
+function startHold(e){
+ cancelHold();var r=reportRow(e.target);if(!r)return;
+ var point=e.touches?e.touches[0]:e;holdX=point.clientX;holdY=point.clientY;
+ holdTimer=setTimeout(function(){openReport(r)},550);
+}
+var scoreBox=el('score');
+scoreBox.addEventListener('touchstart',startHold);
+scoreBox.addEventListener('touchmove',function(e){var p=e.touches[0];if(Math.abs(p.clientX-holdX)+Math.abs(p.clientY-holdY)>12)cancelHold()});
+['touchend','touchcancel'].forEach(function(type){scoreBox.addEventListener(type,cancelHold)});
+scoreBox.oncontextmenu=function(e){var r=reportRow(e.target);if(r){e.preventDefault();cancelHold();if(!selectedLine)openReport(r)}};
+scoreBox.onkeydown=function(e){if(e.key==='Enter'){var r=reportRow(e.target);if(r){e.preventDefault();openReport(r)}}};
+document.addEventListener('keydown',function(e){
+ if(selectedLine){
+  if(e.key==='Escape'){closeReport();return}
+  if(e.key==='Tab'){
+   var first=el('report-kind'),last=el('report-cancel');
+   if(e.shiftKey && document.activeElement===first){e.preventDefault();last.focus()}
+   if(!e.shiftKey && document.activeElement===last){e.preventDefault();first.focus()}
+  }
+  return;
+ }
+ if(!document.body.classList.contains('playing'))return;
+ if(e.key==='Escape')playMode(false);
+ if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();turnPage(e.key==='ArrowRight'?1:-1)}
+});
+
 el('search').oninput=list;
 function resize(d){size=Math.max(14,Math.min(40,size+d));save('text',size);render()}
 el('small').onclick=function(){resize(-2)};el('big').onclick=function(){resize(2)};
@@ -243,7 +370,7 @@ function installLibrary(data){
  var selected=current.file;
  useLibrary(data);
  current=songs.filter(function(s){return s.file===selected && visible(s)})[0] || songs.filter(visible)[0] || songs[0];
- list();render();el('update-fallback').hidden=true;
+ shift=storedPitch()||0;list();render();el('update-fallback').hidden=true;
  updateMessage('Aktualizováno. Skladeb v knihovně: '+songs.length,'Updated. Songs in the library: '+songs.length);
 }
 var sessionToken='',lastWasCheck=true;

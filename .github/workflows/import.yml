@@ -24,11 +24,13 @@ jobs:
         env:
           REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
         run: python3 tools/build.py
+      - name: Check arrangements
+        run: python3 tools/check_arrangements.py
       - name: Save converted songs
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- ChordPro tools/imports.json library.json version.json README.md knihovna.js index.html
+          git add -- ARRANGEMENT-CHECKS.md ChordPro tools/imports.json library.json version.json README.md knihovna.js index.html
           if ! git diff --cached --quiet; then
             git commit -m 'Refresh the offline song library'
             git push origin HEAD:main
