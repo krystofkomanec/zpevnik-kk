@@ -257,6 +257,8 @@ async function inspectPages(page, advance) {
   let previous = -1;
   for (let i = 0; i < 160; i++) {
     const view = await visibleScore(page);
+    const counter=page.locator('#page-count');
+    await expect(counter).toHaveText(new RegExp('^Strana '+(i+1)+' z [0-9]+$'));
     expect(view.clipped).toEqual([]);
     expect(view.misaligned).toEqual([]);
     expect(view.orphanHeading).toBe(false);
@@ -264,6 +266,7 @@ async function inspectPages(page, advance) {
     expect(view.position).toBeGreaterThan(previous);
     view.visible.forEach(index => seen.add(index));
     if (await page.locator('#next-page').isDisabled()) {
+      await expect(counter).toHaveText('Strana '+(i+1)+' z '+(i+1));
       expect(seen.size).toBe(view.count);
       return;
     }

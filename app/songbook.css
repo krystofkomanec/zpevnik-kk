@@ -860,6 +860,13 @@ body.chart-open { overflow: hidden }
 .playing .section {
   margin: .5em 0 .8em;
 }
+#page-count {
+  align-self: center;
+  margin-right: auto;
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
 #page-nav {
   display: none;
 }

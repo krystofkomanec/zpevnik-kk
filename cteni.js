@@ -560,10 +560,19 @@ function loadSongSettings(){
  size=Math.min(40,Math.max(14,Number(get('zoom.'+songKey(current),get('text','21')))||21));
 }
 var pages=[],pageTail,layoutFrame=0;
+function pageIndexAt(position){
+ return pages.findIndex(function(page,i){
+  return !pages[i+1] || Math.floor(pages[i+1].start)>position+.49;
+ });
+}
 function pageState(){
  if(!document.body.classList.contains('playing'))return;
  var area=el('score'),position=area.scrollTop;
- var page=!scrollFrame && pages.find(function(page){return Math.abs(Math.floor(page.start)-position)<.5});
+ var index=pageIndexAt(position),currentPage=pages[index];
+ var label=currentPage?t('Strana ','Page ')+(index+1)+t(' z ',' of ')+pages.length:'';
+ var counter=el('page-count');
+ if(counter.textContent!==label)counter.textContent=label;
+ var page=!scrollFrame && currentPage && Math.abs(Math.floor(currentPage.start)-position)<.5 && currentPage;
  var gap=page?Math.max(0,area.clientHeight-(page.end-position)):0;
  var frame=el('score-frame');
  frame.style.setProperty('--page-gap',gap+'px');
@@ -626,7 +635,7 @@ function measurePages(){
  area.appendChild(pageTail);
  el('score-frame').style.setProperty('--score-scrollbar',(area.offsetWidth-area.clientWidth)+'px');
  if(wasPaged){
-  var containing=pages.find(function(page,i){return !pages[i+1] || Math.floor(pages[i+1].start)>position});
+  var containing=pages[pageIndexAt(position)];
   area.scrollTop=Math.floor(containing.start);
  }else area.scrollTop=position;
  pageState();
