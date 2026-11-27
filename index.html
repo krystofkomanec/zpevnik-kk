@@ -45,10 +45,13 @@ article{padding:36px 4.5%}.song-head{padding:0 0 16px}.meta,.dark .meta{font-wei
 .playing main,.playing article{display:block;max-width:none;margin:0;padding:0}
 #play-bar{display:none}.playing #play-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;padding:4px 16px;background:var(--surface);border-bottom:1px solid var(--edge)}
 #playing-title{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.playing #score{box-sizing:border-box;height:calc(100vh - 52px);height:calc(100dvh - 52px);margin:0 24px;padding:8px 0;max-width:none;column-count:1;column-gap:24px;column-fill:auto;overflow-x:auto;overflow-y:hidden}
-.playing .stanza-block{break-inside:avoid-column;-webkit-column-break-inside:avoid}.playing .section{margin:.5em 0 .8em;break-after:avoid}.playing .line{break-inside:avoid}
-.playing .page-edge{display:block;position:fixed;top:52px;bottom:0;width:24px;padding:0;min-height:0;border:0;color:var(--muted);background:transparent;font-size:18px}.page-edge:first-letter{opacity:.7}#prev-page{left:0}#next-page{right:0}
-@media (orientation:landscape) and (min-width:700px){.playing #score{column-count:2}}
+.playing article{position:fixed;top:0;bottom:0;left:0;right:0;display:flex;flex-direction:column;background:var(--surface)}
+.playing #play-bar,.playing #page-nav{flex:none}
+.playing #score{flex:1;min-height:0;overflow-y:auto;max-width:none;padding:8px 16px;-webkit-overflow-scrolling:touch}
+#score{touch-action:pan-y}
+.playing .section{margin:.5em 0 .8em}
+#page-nav{display:none}.playing #page-nav{display:flex;justify-content:flex-end;gap:8px;padding:5px 12px;padding-bottom:max(5px,env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--edge)}
+#page-nav button{min-height:42px}
 #capo-fret{font:inherit;color:var(--ink);background:var(--surface);border:0;border-radius:6px;padding:5px;min-height:32px}.library-order{display:flex;align-items:center;gap:6px;font-size:12px;margin:4px 0 10px}.library-order select{min-width:0;max-width:100%;flex:1;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--edge);border-radius:6px;padding:5px}#share-songbook{text-align:center;padding:8px}#share-songbook img{display:block;width:100%;max-width:360px;height:auto;margin:0 auto 6px;image-rendering:pixelated}.long-word,.long-word .chunk{white-space:normal;overflow-wrap:anywhere;word-wrap:break-word;max-width:100%}</style>
 <header><div class="brand"><button id="toggle" type="button" aria-label="Menu knihovny" data-en-aria-label="Library menu" aria-controls="library" aria-expanded="false"><span class="bars"></span></button><b data-en="KK Songbook">Zpěvník KK</b></div><div><button id="language" type="button"></button> <button id="theme" title="Tmavý režim" data-en-title="Dark mode" aria-label="Tmavý režim" data-en-aria-label="Dark mode" aria-pressed="false">☀</button></div></header>
 <main><aside id="library"><div class="library-title"><h2 data-en="Library">Knihovna</h2><p id="count"></p></div><input type="search" id="search" placeholder="Skladba nebo interpret" data-en-placeholder="Song or artist" aria-label="Hledat" data-en-aria-label="Search"><label class="library-order"><span data-en="Sort by">Řadit podle</span><select id="library-order"><option value="title" data-en="Title (A–Z)">Názvu (A–Z)</option><option value="source" data-en="Original file date (newest first)">Data původního souboru (nejnovější)</option><option value="imported" data-en="Songbook import (newest first)">Importu do aplikace (nejnovější)</option></select></label><details id="library-tools"><summary data-en="Library tools">Nástroje knihovny</summary><div class="actions"><button id="export-settings" data-en="Export song settings">Exportovat nastavení skladeb</button><button id="import-settings" data-en="Import song settings">Importovat nastavení skladeb</button><input id="settings-file" type="file" accept=".json,application/json" hidden><p id="settings-status" role="status" hidden></p><button id="export-notes">Export připomínek</button><a href="https://github.com/krystofkomanec/zpevnik-kk/upload/main/inbox" target="_blank" rel="noopener" data-en="Upload a PDF">Nahrát PDF</a><button id="check-library" data-en="Check for updates">Zkontrolovat aktuálnost</button><button id="update-library" hidden data-en="Load latest songs">Nahrát nejnovější data</button>
@@ -56,7 +59,7 @@ article{padding:36px 4.5%}.song-head{padding:0 0 16px}.meta,.dark .meta{font-wei
 <div id="update-fallback" hidden><details id="private-access"><summary data-en="Private repository access">Přístup k soukromému repozitáři</summary><label><span data-en="Read-only GitHub token (this session only)">GitHub token pro čtení (jen pro toto otevření)</span> <input id="library-token" type="password" autocomplete="off" spellcheck="false"></label> <button id="private-update" data-en="Load songs">Načíst skladby</button></details><a href="https://github.com/krystofkomanec/zpevnik-kk/releases/latest/download/library.json" target="_blank" rel="noopener" data-en="Download library.json">Stáhnout library.json</a> · <label><span data-en="Load downloaded file">Načíst stažený soubor</span> <input id="update-file" type="file" accept=".json,application/json"></label></div>
 <a id="share-songbook" href="https://drive.google.com/file/d/1BgUI4FF8XWqs6uL1Bz-Np9d4rHHMnVvF/view?usp=sharing" target="_blank" rel="noopener"><img alt="" width="540" height="540" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAhwAAAIcAQAAAACVhUrRAAADOUlEQVR42u2dQY7bMAxFP4vZyzeY+x8rN5BPwC4oUZSTrqYFCugZQRA7ylsQICiSn4q5fnzdv/QXLiBAgAABAgQIECBAgAD5JxDL65Lu8VGSXcqH8RpPcjGGBXI4pHlc67ZHHcDUXJJ9u12yS97fFmNYIGdDMo6MaNLcLrm7bvOX6TZ3Dz+qizEsECDbdVu8m02XaW5m4zmGBQLkD5DYsMX72Kq9TJK7l3CDYYGcDPla/lKeWsvEp5uk2zye3Nf7YgwL5GhIqa2N4sAl+16lg4g+40ldjGGBnB13fE92fOY749vbYo1/CDoYFsiZEI1qc/NarB7JTvNYsD7MqFTL2t4xLJBzfSeLad7l7qOJ05VNHO8at+Ey8xbfAXK67/RRVathJRekW6141HyFHnwHyNl1NpPUuiS/L5/JjpcMyJubZM1H5S1+gmGBsGdrmyZnE+c031o/xB0gQEqtoLpP5jsj6+kl35EyJyLfAYLvVP3nqgn0VWTbSgQl8cF3gJDvzFbOZZLuKzKabO6M20h5ZmaEYYEAWQLpb/e+Zg1GezSVBkXMtlQHGBbI8Xo2iygTnjLii1chgecyyWdgwrBADq+zfWiJLuVAaZK+iRDId4DQ3xnRp7m1Hu5hM6+xGXHiKy8/wbBATq+z5Q4tGzrN13h182d/Bz0bEOLOjCmbRrp1W0nQ5bcNvUH4VygNMCwQ8p2ikX7oPx9t022qlHwHiDhjytKV4oiPcI0oRMdJBXkGyLa7w7BAqLN1vUefOndQ852tEEfcAcLsW8pyUpOTgwmldr2UbNQKgOA7bXefEllqzS0XrGYQvgMEHXWZgFveVHXUuaA5cQcIvrN8p6s6S+311E1d/SFxBwi+U69tvLrM8mwla2rUQERvVFrqGqn1MXSQvdEyaj3f+zjzEMMCYc/WttNy6ms2cfQYzWbPBoS48zjrQzlfkMKbGWUsDzxsPfWiGBYIED1OB3WPv915/v1Bmyfr8t9VQIB8usysig3sKkWDl+VeDsMCYW5Ub5pqa32M8EzVdEz32Dy7AMMCOd13yq5sOMucgKuTbmvugDobkNMh5j9n3BgWCBAgQIAAAQIECBAg/yHkN/AEUFvNs/47AAAAAElFTkSuQmCC"><span data-en="Open songbook on Google Drive">Otevřít zpěvník na Google Drivu</span></a>
 </div></details><div id="list"></div></aside>
-<article><div id="play-bar"><span id="playing-title"></span><button id="exit-play" data-en="Exit play mode">Zavřít hraní</button></div><div class="song-head"><div class="meta" id="artist"></div><h1 id="title"></h1><div class="facts"><div id="cap"></div><div id="harp" hidden></div></div><details id="guitar"><summary class="guitar-summary"><span data-en="Guitar chords">Kytarové hmaty</span><small id="chords"></small></summary><div id="charts"></div></details></div><div id="tools"><button id="play" aria-pressed="false" data-en="Play mode">Režim hraní</button><span class="group"><button id="small" aria-label="Zmenšit text" data-en-aria-label="Decrease text size">A−</button> <button id="big" aria-label="Zvětšit text" data-en-aria-label="Increase text size">A+</button></span><span class="group"><span data-en="Transpose">Transpozice</span> <button id="down" aria-label="O půltón níž" data-en-aria-label="Down one semitone">−</button> <button id="pitch" title="Vrátit původní tóninu" data-en-title="Restore original key">0</button> <button id="up" aria-label="O půltón výš" data-en-aria-label="Up one semitone">+</button></span><label class="group"><span data-en="Capo">Kapodastr</span><select id="capo-fret"></select></label><button id="save-pitch"></button><small id="saved-pitch"></small></div><button class="page-edge" id="prev-page" aria-label="Předchozí strana" data-en-aria-label="Previous page">‹</button><button class="page-edge" id="next-page" aria-label="Další strana" data-en-aria-label="Next page">›</button><div id="score"></div><p id="status" role="status"></p></article></main>
+<article><div id="play-bar"><span id="playing-title"></span><button id="exit-play" data-en="Exit play mode">Zavřít hraní</button></div><div class="song-head"><div class="meta" id="artist"></div><h1 id="title"></h1><div class="facts"><div id="cap"></div><div id="harp" hidden></div></div><details id="guitar"><summary class="guitar-summary"><span data-en="Guitar chords">Kytarové hmaty</span><small id="chords"></small></summary><div id="charts"></div></details></div><div id="tools"><button id="play" aria-pressed="false" data-en="Play mode">Režim hraní</button><span class="group"><button id="small" aria-label="Zmenšit text" data-en-aria-label="Decrease text size">A−</button> <button id="big" aria-label="Zvětšit text" data-en-aria-label="Increase text size">A+</button></span><span class="group"><span data-en="Transpose">Transpozice</span> <button id="down" aria-label="O půltón níž" data-en-aria-label="Down one semitone">−</button> <button id="pitch" title="Vrátit původní tóninu" data-en-title="Restore original key">0</button> <button id="up" aria-label="O půltón výš" data-en-aria-label="Up one semitone">+</button></span><label class="group"><span data-en="Capo">Kapodastr</span><select id="capo-fret"></select></label><button id="save-pitch"></button><small id="saved-pitch"></small></div><div id="score"></div><div id="page-nav"><button id="prev-page" aria-label="Předchozí stránka" data-en-aria-label="Previous page">↑</button><button id="next-page" data-en="Next page ↓">Další stránka ↓</button></div><p id="status" role="status"></p></article></main>
 <div id="report-overlay" hidden><form id="report-form" role="dialog" aria-modal="true" aria-labelledby="report-title">
 <h2 id="report-title" data-en="Report a line">Připomínka k řádku</h2><p id="report-context"></p><p id="report-text"></p>
 <label><span data-en="Issue">Problém</span><select id="report-kind"><option value="missing-chord" data-en="Missing chord">Chybí akord</option><option value="move-chord" data-en="Move a chord">Posunout akord</option><option value="lyrics" data-en="Incorrect lyrics">Chybný text</option></select></label>
@@ -115,7 +118,7 @@ function translatePage(){
 }
 el('language').onclick=function(){
  english=!english;save('language',english?'en':'cs');translatePage();
- if(!visible(current)){current=songs.filter(visible)[0];shift=storedPitch()||0}
+ if(!visible(current)){current=songs.filter(visible)[0];loadSongSettings()}
  list();render();
 };
 function theme(){document.body.classList.toggle('dark',dark);el('theme').textContent=dark?'☾':'☀';el('theme').setAttribute('aria-pressed',String(dark));save('dark',dark?'1':'0')}
@@ -162,7 +165,7 @@ function list(){
 }
 function openSong(s,button){
  rememberLibrary();
- current=s;shift=storedPitch()||0;
+ current=s;loadSongSettings();
  var active=el('list').querySelector('[aria-current="true"]');
  if(active)active.setAttribute('aria-current','false');
  button.setAttribute('aria-current','true');document.body.classList.remove('browse');
@@ -402,11 +405,21 @@ el('save-pitch').onclick=function(){
   pitchState();
  }catch(error){el('saved-pitch').textContent=t('Nelze uložit','Could not save')}
 };
+function loadSongSettings(){
+ shift=storedPitch()||0;
+ size=Math.min(40,Math.max(14,Number(get('zoom.'+current.file,get('text','21')))||21));
+}
+function pageState(){
+ if(!document.body.classList.contains('playing'))return;
+ var area=el('score');
+ el('prev-page').disabled=area.scrollTop<=0;
+ el('next-page').disabled=area.scrollTop+area.clientHeight>=area.scrollHeight-1;
+}
 function playMode(on){
  document.body.classList.toggle('playing',on);
  el('play').setAttribute('aria-pressed',String(on));
  el('play').textContent=on?t('Zavřít hraní','Exit play mode'):t('Režim hraní','Play mode');
- el('score').scrollLeft=0;el('playing-title').textContent=current.title;
+ el('score').scrollTop=0;pageState();el('playing-title').textContent=current.title;
  if(on)el('exit-play').focus();
  window.scrollTo(0,0);
 }
@@ -414,8 +427,11 @@ el('play').onclick=function(){playMode(!document.body.classList.contains('playin
 el('exit-play').onclick=function(){playMode(false);el('play').focus()};
 function turnPage(direction){
  var area=el('score');
- area.scrollLeft+=direction*(area.clientWidth+24);
+ area.scrollTop+=direction*area.clientHeight;pageState();
 }
+el('score').addEventListener('scroll',pageState);
+el('score').addEventListener('toggle',pageState,true);
+window.addEventListener('resize',pageState);
 el('prev-page').onclick=function(){turnPage(-1)};
 el('next-page').onclick=function(){turnPage(1)};
 function groupStanzas(score){
@@ -481,13 +497,13 @@ function settingsMessage(message){
  var status=el('settings-status');status.hidden=false;status.textContent=message;
 }
 function validSetting(kind,n){
- return typeof n==='number' && Math.floor(n)===n && n<=12 && n>=(kind==='pitch'?-12:0);
+ return typeof n==='number' && Math.floor(n)===n && (kind==='zoom'?n>=14 && n<=40:n<=12 && n>=(kind==='pitch'?-12:0));
 }
 el('export-settings').onclick=function(){
  try{
   var entries=Object.create(null);
   for(var i=0;i<localStorage.length;i++){
-   var key=localStorage.key(i),match=/^zpevnik\.(capo|pitch)\.(.+)$/.exec(key);
+   var key=localStorage.key(i),match=/^zpevnik\.(capo|pitch|zoom)\.(.+)$/.exec(key);
    if(!match)continue;
    var raw=localStorage.getItem(key),n=Number(raw);
    if(raw!==String(n)||!validSetting(match[1],n))throw Error();
@@ -507,7 +523,7 @@ function importSettings(data){
   var entry=data.songs[file];
   if(!file || !entry || typeof entry!=='object' || Array.isArray(entry) || !Object.keys(entry).length)throw Error();
   Object.keys(entry).forEach(function(kind){
-   if((kind!=='pitch' && kind!=='capo') || !validSetting(kind,entry[kind]))throw Error();
+   if((kind!=='pitch' && kind!=='capo' && kind!=='zoom') || !validSetting(kind,entry[kind]))throw Error();
    var key='zpevnik.'+kind+'.'+file;
    changes.push({key:key,value:String(entry[kind]),previous:localStorage.getItem(key)});
   });
@@ -524,6 +540,7 @@ function importSettings(data){
  }
  var active=data.songs[current.file];
  if(active){
+  if(active.zoom!==undefined)size=active.zoom;
   if(active.pitch!==undefined)shift=active.pitch;
   render();
  }
@@ -571,11 +588,34 @@ document.addEventListener('keydown',function(e){
  }
  if(!document.body.classList.contains('playing'))return;
  if(e.key==='Escape')playMode(false);
- if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();turnPage(e.key==='ArrowRight'?1:-1)}
+ if(['PageDown','PageUp','ArrowRight','ArrowLeft','ArrowDown','ArrowUp'].indexOf(e.key)>=0){e.preventDefault();turnPage(['PageDown','ArrowRight','ArrowDown'].indexOf(e.key)>=0?1:-1)}
 });
 
 el('search').oninput=list;
-function resize(d){size=Math.max(14,Math.min(40,size+d));save('text',size);render()}
+function saveZoom(){
+ save('text',size);save('zoom.'+current.file,size);
+}
+function resize(d){size=Math.max(14,Math.min(40,size+d));saveZoom();render();pageState()}
+var pinch=null;
+function fingerDistance(points){
+ var x=points[0].clientX-points[1].clientX,y=points[0].clientY-points[1].clientY;
+ return Math.sqrt(x*x+y*y);
+}
+scoreBox.addEventListener('touchstart',function(e){
+ if(e.touches.length!==2)return;
+ cancelHold();var distance=fingerDistance(e.touches);
+ if(distance>0){pinch={distance:distance,size:size};e.preventDefault()}
+},{passive:false});
+scoreBox.addEventListener('touchmove',function(e){
+ if(!pinch||e.touches.length!==2)return;
+ e.preventDefault();size=Math.max(14,Math.min(40,Math.round(pinch.size*fingerDistance(e.touches)/pinch.distance)));
+ scoreBox.style.fontSize=size+'px';
+},{passive:false});
+function endPinch(e){
+ if(pinch && e.touches.length<2){pinch=null;saveZoom();el('small').disabled=size<=14;el('big').disabled=size>=40;pageState()}
+}
+scoreBox.addEventListener('touchend',endPinch);
+scoreBox.addEventListener('touchcancel',endPinch);
 el('small').onclick=function(){resize(-2)};el('big').onclick=function(){resize(2)};
 el('up').onclick=function(){shift=Math.min(12,shift+1);render()};el('down').onclick=function(){shift=Math.max(-12,shift-1);render()};el('pitch').onclick=function(){shift=0;render()};
 var cacheKey='zpevnik.library.v1';
@@ -613,7 +653,7 @@ function installLibrary(data){
  var selected=current.file;
  useLibrary(data);
  current=songs.filter(function(s){return s.file===selected && visible(s)})[0] || songs.filter(visible)[0] || songs[0];
- shift=storedPitch()||0;list();render();el('update-fallback').hidden=true;
+ loadSongSettings();list();render();el('update-fallback').hidden=true;
  updateMessage('Aktualizováno. Skladeb v knihovně: '+songs.length,'Updated. Songs in the library: '+songs.length);
 }
 var sessionToken='',lastWasCheck=true;
@@ -689,7 +729,7 @@ translatePage();theme();
 el('search').value=libraryView.query;
 current=songs.filter(function(song){return visible(song)&&song.file===libraryView.file})[0] ||
  songs.filter(function(song){return visible(song)&&song.title==='Runaway'})[0] || songs.filter(visible)[0];
-shift=storedPitch()||0;
+loadSongSettings();
 document.body.classList.toggle('browse',!!libraryView.browse);
 el('toggle').setAttribute('aria-expanded',String(!!libraryView.browse));
 list();render();el('list').scrollTop=libraryView.top||0;

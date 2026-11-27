@@ -49,7 +49,7 @@ function translatePage(){
 }
 el('language').onclick=function(){
  english=!english;save('language',english?'en':'cs');translatePage();
- if(!visible(current)){current=songs.filter(visible)[0];shift=storedPitch()||0}
+ if(!visible(current)){current=songs.filter(visible)[0];loadSongSettings()}
  list();render();
 };
 function theme(){document.body.classList.toggle('dark',dark);el('theme').textContent=dark?'☾':'☀';el('theme').setAttribute('aria-pressed',String(dark));save('dark',dark?'1':'0')}
@@ -96,7 +96,7 @@ function list(){
 }
 function openSong(s,button){
  rememberLibrary();
- current=s;shift=storedPitch()||0;
+ current=s;loadSongSettings();
  var active=el('list').querySelector('[aria-current="true"]');
  if(active)active.setAttribute('aria-current','false');
  button.setAttribute('aria-current','true');document.body.classList.remove('browse');
@@ -336,11 +336,21 @@ el('save-pitch').onclick=function(){
   pitchState();
  }catch(error){el('saved-pitch').textContent=t('Nelze uložit','Could not save')}
 };
+function loadSongSettings(){
+ shift=storedPitch()||0;
+ size=Math.min(40,Math.max(14,Number(get('zoom.'+current.file,get('text','21')))||21));
+}
+function pageState(){
+ if(!document.body.classList.contains('playing'))return;
+ var area=el('score');
+ el('prev-page').disabled=area.scrollTop<=0;
+ el('next-page').disabled=area.scrollTop+area.clientHeight>=area.scrollHeight-1;
+}
 function playMode(on){
  document.body.classList.toggle('playing',on);
  el('play').setAttribute('aria-pressed',String(on));
  el('play').textContent=on?t('Zavřít hraní','Exit play mode'):t('Režim hraní','Play mode');
- el('score').scrollLeft=0;el('playing-title').textContent=current.title;
+ el('score').scrollTop=0;pageState();el('playing-title').textContent=current.title;
  if(on)el('exit-play').focus();
  window.scrollTo(0,0);
 }
@@ -348,8 +358,11 @@ el('play').onclick=function(){playMode(!document.body.classList.contains('playin
 el('exit-play').onclick=function(){playMode(false);el('play').focus()};
 function turnPage(direction){
  var area=el('score');
- area.scrollLeft+=direction*(area.clientWidth+24);
+ area.scrollTop+=direction*area.clientHeight;pageState();
 }
+el('score').addEventListener('scroll',pageState);
+el('score').addEventListener('toggle',pageState,true);
+window.addEventListener('resize',pageState);
 el('prev-page').onclick=function(){turnPage(-1)};
 el('next-page').onclick=function(){turnPage(1)};
 function groupStanzas(score){
@@ -415,13 +428,13 @@ function settingsMessage(message){
  var status=el('settings-status');status.hidden=false;status.textContent=message;
 }
 function validSetting(kind,n){
- return typeof n==='number' && Math.floor(n)===n && n<=12 && n>=(kind==='pitch'?-12:0);
+ return typeof n==='number' && Math.floor(n)===n && (kind==='zoom'?n>=14 && n<=40:n<=12 && n>=(kind==='pitch'?-12:0));
 }
 el('export-settings').onclick=function(){
  try{
   var entries=Object.create(null);
   for(var i=0;i<localStorage.length;i++){
-   var key=localStorage.key(i),match=/^zpevnik\.(capo|pitch)\.(.+)$/.exec(key);
+   var key=localStorage.key(i),match=/^zpevnik\.(capo|pitch|zoom)\.(.+)$/.exec(key);
    if(!match)continue;
    var raw=localStorage.getItem(key),n=Number(raw);
    if(raw!==String(n)||!validSetting(match[1],n))throw Error();
@@ -441,7 +454,7 @@ function importSettings(data){
   var entry=data.songs[file];
   if(!file || !entry || typeof entry!=='object' || Array.isArray(entry) || !Object.keys(entry).length)throw Error();
   Object.keys(entry).forEach(function(kind){
-   if((kind!=='pitch' && kind!=='capo') || !validSetting(kind,entry[kind]))throw Error();
+   if((kind!=='pitch' && kind!=='capo' && kind!=='zoom') || !validSetting(kind,entry[kind]))throw Error();
    var key='zpevnik.'+kind+'.'+file;
    changes.push({key:key,value:String(entry[kind]),previous:localStorage.getItem(key)});
   });
@@ -458,6 +471,7 @@ function importSettings(data){
  }
  var active=data.songs[current.file];
  if(active){
+  if(active.zoom!==undefined)size=active.zoom;
   if(active.pitch!==undefined)shift=active.pitch;
   render();
  }
@@ -505,11 +519,34 @@ document.addEventListener('keydown',function(e){
  }
  if(!document.body.classList.contains('playing'))return;
  if(e.key==='Escape')playMode(false);
- if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();turnPage(e.key==='ArrowRight'?1:-1)}
+ if(['PageDown','PageUp','ArrowRight','ArrowLeft','ArrowDown','ArrowUp'].indexOf(e.key)>=0){e.preventDefault();turnPage(['PageDown','ArrowRight','ArrowDown'].indexOf(e.key)>=0?1:-1)}
 });
 
 el('search').oninput=list;
-function resize(d){size=Math.max(14,Math.min(40,size+d));save('text',size);render()}
+function saveZoom(){
+ save('text',size);save('zoom.'+current.file,size);
+}
+function resize(d){size=Math.max(14,Math.min(40,size+d));saveZoom();render();pageState()}
+var pinch=null;
+function fingerDistance(points){
+ var x=points[0].clientX-points[1].clientX,y=points[0].clientY-points[1].clientY;
+ return Math.sqrt(x*x+y*y);
+}
+scoreBox.addEventListener('touchstart',function(e){
+ if(e.touches.length!==2)return;
+ cancelHold();var distance=fingerDistance(e.touches);
+ if(distance>0){pinch={distance:distance,size:size};e.preventDefault()}
+},{passive:false});
+scoreBox.addEventListener('touchmove',function(e){
+ if(!pinch||e.touches.length!==2)return;
+ e.preventDefault();size=Math.max(14,Math.min(40,Math.round(pinch.size*fingerDistance(e.touches)/pinch.distance)));
+ scoreBox.style.fontSize=size+'px';
+},{passive:false});
+function endPinch(e){
+ if(pinch && e.touches.length<2){pinch=null;saveZoom();el('small').disabled=size<=14;el('big').disabled=size>=40;pageState()}
+}
+scoreBox.addEventListener('touchend',endPinch);
+scoreBox.addEventListener('touchcancel',endPinch);
 el('small').onclick=function(){resize(-2)};el('big').onclick=function(){resize(2)};
 el('up').onclick=function(){shift=Math.min(12,shift+1);render()};el('down').onclick=function(){shift=Math.max(-12,shift-1);render()};el('pitch').onclick=function(){shift=0;render()};
 var cacheKey='zpevnik.library.v1';
@@ -547,7 +584,7 @@ function installLibrary(data){
  var selected=current.file;
  useLibrary(data);
  current=songs.filter(function(s){return s.file===selected && visible(s)})[0] || songs.filter(visible)[0] || songs[0];
- shift=storedPitch()||0;list();render();el('update-fallback').hidden=true;
+ loadSongSettings();list();render();el('update-fallback').hidden=true;
  updateMessage('Aktualizováno. Skladeb v knihovně: '+songs.length,'Updated. Songs in the library: '+songs.length);
 }
 var sessionToken='',lastWasCheck=true;
@@ -623,7 +660,7 @@ translatePage();theme();
 el('search').value=libraryView.query;
 current=songs.filter(function(song){return visible(song)&&song.file===libraryView.file})[0] ||
  songs.filter(function(song){return visible(song)&&song.title==='Runaway'})[0] || songs.filter(visible)[0];
-shift=storedPitch()||0;
+loadSongSettings();
 document.body.classList.toggle('browse',!!libraryView.browse);
 el('toggle').setAttribute('aria-expanded',String(!!libraryView.browse));
 list();render();el('list').scrollTop=libraryView.top||0;
