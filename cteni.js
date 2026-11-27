@@ -372,7 +372,7 @@ var chartSymbols=[], selectedChart='', chartMode='basic';
 function showCharts(){
  var box=el('charts');
  clear(box);
- if(!el('guitar').open || !chartSymbols.length)return;
+ if(!el('chart-dialog').open || !chartSymbols.length)return;
  var picker=make('div',undefined,'chart-picker');
  var modes=make('div',undefined,'chart-modes');
  var panel=make('div',undefined,'chart-options');
@@ -414,7 +414,22 @@ function showCharts(){
  });
  draw();
 }
-el('guitar').ontoggle=showCharts;
+var chartDialog=el('chart-dialog');
+el('guitar').onclick=function(){
+ selectedChart=chartSymbols[0];chartMode='basic';
+ chartDialog.showModal();
+ document.body.classList.add('chart-open');
+ showCharts();
+};
+el('chart-close').onclick=function(){chartDialog.close()};
+chartDialog.addEventListener('close',function(){
+ document.body.classList.remove('chart-open');
+});
+chartDialog.addEventListener('click',function(event){
+ if(event.target!==chartDialog)return;
+ var rect=chartDialog.getBoundingClientRect();
+ if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)chartDialog.close();
+});
 
 function songLabel(value){
  if(!english || !value)return value;

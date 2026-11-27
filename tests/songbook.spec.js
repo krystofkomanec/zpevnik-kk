@@ -170,7 +170,9 @@ test('guitar alternatives use playable shapes and keep harmonic suggestions sepa
   const screenshotDir = process.env.SONGBOOK_SCREENSHOTS;
   const errors = await openOffline(page);
   await install(page, [{...englishSong, cho: '[C]One [Dm]two [F]three [G]four [Am]five [Em]six\n'}]);
-  await page.locator('#guitar > summary').click();
+  const scoreTop = await page.locator('#score').evaluate(el=>el.getBoundingClientRect().top);
+  await page.locator('#guitar').click();
+  await expect(page.getByRole('dialog')).toBeVisible();
   const picker = page.locator('.chart-picker');
   const modes = page.locator('.chart-modes');
   const cards = page.locator('.chart-options .chart');
@@ -197,9 +199,15 @@ test('guitar alternatives use playable shapes and keep harmonic suggestions sepa
   await expect(cards.locator('b').first()).toHaveText('Gsus4');
   await expect(chordLabels(page)).toHaveText(['C','Dm','F','G','Am','Em']);
   if (screenshotDir) await page.screenshot({path: path.join(screenshotDir, 'guitar-voicings.png'), fullPage: true});
+  await page.locator('#chart-close').click();
+  await expect(page.locator('#guitar')).toBeFocused();
+  expect(await page.locator('#score').evaluate(el=>el.getBoundingClientRect().top)).toBe(scoreTop);
   await page.locator('#song-settings-button').click();
   await page.locator('#down').click();
+  await page.locator('#guitar').click();
   await expect(picker.locator('button').first()).toHaveText('H');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#chart-dialog')).toBeHidden();
   expect(errors).toEqual([]);
 });
 

@@ -74,11 +74,8 @@
             <div id="cap"></div>
             <div id="harp" hidden></div>
           </div>
-          <details id="guitar">
-            <summary class="guitar-summary"><span data-en="Guitar chords">Kytarové hmaty</span><small id="chords"></small>
-            </summary>
-            <div id="charts"></div>
-        </details></div>
+          <button id="guitar" class="guitar-summary" aria-haspopup="dialog" aria-controls="chart-dialog"><span data-en="Guitar chords">Kytarové hmaty</span><small id="chords"></small></button>
+        </div>
         <div id="tools">
           <div class="song-actions">
             <button id="play" aria-pressed="false" data-en="Play mode">Režim hraní</button>
@@ -101,6 +98,13 @@
         <p id="status" role="status"></p>
       </article>
     </main>
+    <dialog id="chart-dialog" aria-labelledby="chart-title">
+      <div class="chart-heading">
+        <h2 id="chart-title" data-en="Guitar chords">Kytarové hmaty</h2>
+        <button id="chart-close" data-en="Close">Zavřít</button>
+      </div>
+      <div id="charts"></div>
+    </dialog>
     <div id="report-overlay" hidden>
       <form id="report-form" role="dialog" aria-modal="true" aria-labelledby="report-title">
         <h2 id="report-title" data-en="Report a line">Připomínka k řádku</h2>

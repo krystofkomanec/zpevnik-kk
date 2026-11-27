@@ -563,7 +563,8 @@ h1 {
   padding: 9px 0;
   min-height: 40px;
   cursor: pointer;
-  list-style: none;
+  border: 0;
+  text-align: left;
   font: 600 .85rem/1.45 system-ui,sans-serif;
   color: var(--ink);
 }
@@ -573,7 +574,7 @@ h1 {
 .guitar-summary>span {
   white-space: nowrap;
 }
-.guitar-summary>span::after,.settings-caret {
+.settings-caret {
   content: "";
   display: inline-block;
   width: 6px;
@@ -588,15 +589,43 @@ h1 {
   color: var(--muted);
   overflow-wrap: break-word;
 }
-#guitar[open] .guitar-summary>span::after,#song-settings-button[aria-expanded=true] .settings-caret {
+#song-settings-button[aria-expanded=true] .settings-caret {
   transform: rotate(225deg);
 }
-#charts {
-  margin: 8px 0 16px;
-  padding: 12px;
+#chart-dialog:not([open]) { display: none }
+#chart-dialog {
+  position: fixed;
+  top: 7vh;
+  bottom: auto;
+  margin: 0 auto;
+  padding: 0;
+  width: calc(100% - 24px);
+  max-width: 540px;
+  max-height: 86vh;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--surface);
+  color: var(--ink);
   border: 1px solid var(--edge);
-  border-radius: 10px;
+  border-radius: 12px;
+  box-shadow: 0 8px 48px #0004;
 }
+#chart-dialog::backdrop { background: #14251f80 }
+body.chart-open { overflow: hidden }
+.chart-heading {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--edge);
+  background: var(--surface);
+}
+.chart-heading h2 { margin: 0 }
+#chart-close { min-height: 44px }
+#charts { padding: 12px 14px 16px }
 .chart-picker, .chart-modes, .chart-options {
   display: flex;
   flex-wrap: wrap;
@@ -1075,11 +1104,8 @@ input:focus-visible,select:focus-visible {
             <div id="cap"></div>
             <div id="harp" hidden></div>
           </div>
-          <details id="guitar">
-            <summary class="guitar-summary"><span data-en="Guitar chords">Kytarové hmaty</span><small id="chords"></small>
-            </summary>
-            <div id="charts"></div>
-        </details></div>
+          <button id="guitar" class="guitar-summary" aria-haspopup="dialog" aria-controls="chart-dialog"><span data-en="Guitar chords">Kytarové hmaty</span><small id="chords"></small></button>
+        </div>
         <div id="tools">
           <div class="song-actions">
             <button id="play" aria-pressed="false" data-en="Play mode">Režim hraní</button>
@@ -1102,6 +1128,13 @@ input:focus-visible,select:focus-visible {
         <p id="status" role="status"></p>
       </article>
     </main>
+    <dialog id="chart-dialog" aria-labelledby="chart-title">
+      <div class="chart-heading">
+        <h2 id="chart-title" data-en="Guitar chords">Kytarové hmaty</h2>
+        <button id="chart-close" data-en="Close">Zavřít</button>
+      </div>
+      <div id="charts"></div>
+    </dialog>
     <div id="report-overlay" hidden>
       <form id="report-form" role="dialog" aria-modal="true" aria-labelledby="report-title">
         <h2 id="report-title" data-en="Report a line">Připomínka k řádku</h2>
@@ -1496,7 +1529,7 @@ var chartSymbols=[], selectedChart='', chartMode='basic';
 function showCharts(){
  var box=el('charts');
  clear(box);
- if(!el('guitar').open || !chartSymbols.length)return;
+ if(!el('chart-dialog').open || !chartSymbols.length)return;
  var picker=make('div',undefined,'chart-picker');
  var modes=make('div',undefined,'chart-modes');
  var panel=make('div',undefined,'chart-options');
@@ -1538,7 +1571,22 @@ function showCharts(){
  });
  draw();
 }
-el('guitar').ontoggle=showCharts;
+var chartDialog=el('chart-dialog');
+el('guitar').onclick=function(){
+ selectedChart=chartSymbols[0];chartMode='basic';
+ chartDialog.showModal();
+ document.body.classList.add('chart-open');
+ showCharts();
+};
+el('chart-close').onclick=function(){chartDialog.close()};
+chartDialog.addEventListener('close',function(){
+ document.body.classList.remove('chart-open');
+});
+chartDialog.addEventListener('click',function(event){
+ if(event.target!==chartDialog)return;
+ var rect=chartDialog.getBoundingClientRect();
+ if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)chartDialog.close();
+});
 
 function songLabel(value){
  if(!english || !value)return value;
