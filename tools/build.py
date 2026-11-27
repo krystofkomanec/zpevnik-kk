@@ -1,4 +1,5 @@
 """Import new inbox PDFs and build the offline library from individual ChordPro files."""
+import base64
 import hashlib
 import html
 import os
@@ -152,10 +153,16 @@ def build():
     for file,song in by_file.items():
         path=ROOT/'ChordPro'/file
         song['cho']=path.read_text().rstrip()+'\n'
+        tab_files = re.findall(r'^\{image: src="(tabs/[a-z0-9-]+\.png)"\}$', song['cho'], re.M)
+        if tab_files:
+            song['tabImages'] = {name: base64.b64encode((path.parent/name).read_bytes()).decode('ascii')
+                                 for name in sorted(set(tab_files))}
+        else:
+            song.pop('tabImages', None)
         prior=previous.get(file)
         revision=prior.get('revision',1) if prior else 0
         changes=list(prior.get('changes',[])) if prior else []
-        fields=('cho','lang','lyricsLanguage','title','artist','minor','kind','note')
+        fields=('tabImages','cho','lang','lyricsLanguage','title','artist','minor','kind','note')
         if not prior or any(prior.get(key)!=song.get(key) for key in fields):
             revision+=1
             changes.append(song_change(provenance.get(file,path.relative_to(ROOT)), revision))

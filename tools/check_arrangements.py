@@ -8,6 +8,27 @@ TAG = re.compile(r'\[[^\]]+\]')
 VERSE = re.compile(r'\{(?:start_of_verse|sov)(?:[:}])|\{(?:comment|c):\s*(?:\d+\.\s*sloka|sloka\b|verse\b)', re.I)
 
 
+# These are review signals. Keep chord runs in tablature and instrumental grids valid.
+SOURCE_NOISE = re.compile(r'https?://|www\.|(?:%[0-9a-f]{2}){2}|\b(?:view=detail|mid=[a-f0-9]{12,}|Page \d+ of \d+)|^\d{1,2}/\d{1,2}/20\d\d.+(?:akord|chords)|[\w.+-]+@[\w.-]+\.[a-z]{2,}', re.I)
+RAW_CHORD = re.compile(r'[A-H](?:#|b|is|es)?(?:maj|min|mi|m|sus|add|dim|aug|[0-9+#])*(?:/[A-H][#b]?)?')
+SECTION_TOKEN = re.compile(r'\[(?:(?:pre-|post-)?chorus|verse|intro|outro|solo|instrumental|bridge|middle 8)(?:\s+\d+)?\]',re.I)
+
+
+def notation_issue(row):
+    if SOURCE_NOISE.search(row):
+        return 'Possible source link, credit or page header inside the arrangement'
+    if SECTION_TOKEN.search(row):
+        return 'Section name appears among chord or lyric tokens'
+    bare = TAG.sub(' ', row).split()
+    if any(all(RAW_CHORD.fullmatch(x) for x in bare[i:i+3]) for i in range(len(bare)-2)):
+        return 'Sequence of unmarked chords in lyrics'
+    if re.search(r'[-=|]{5,}', row) and re.search(r'[0-9]|[-=|]{10,}',row):
+        return 'Possible tablature outside a tab block'
+    if any(len(word) >= 28 for word in re.findall(r'[^\W\d_]+',TAG.sub('',row))):
+        return 'Possible joined lyric words'
+    return None
+
+
 def issues(text):
     rows = text.splitlines()
     problems = []
@@ -30,7 +51,10 @@ def issues(text):
             continue
         if not row.strip() or row.startswith('#'):
             continue
-        if re.match(r'^\s*(?:\[[^\]]+\]\s*){4,}(?=[^\W\d_])', row):
+        signal = notation_issue(row)
+        if signal:
+            problems.append((number, signal))
+        if re.match(r'^\s*(?:\[[^\]]+\]\s*){4,}(?!x\d+\s*$)(?=[^\W\d_])', row):
             problems.append((number, 'Four or more chords before the first lyric word'))
         if re.fullmatch(r'\s*\d\s+[A-H](?:m|mi|7|#|b)?\s*', row):
             problems.append((number, 'Possible OCR substitution in chord line'))
@@ -38,7 +62,7 @@ def issues(text):
             problems.append((number, 'Page footer in lyrics'))
         if re.fullmatch(r'\s*=\s*\d+\.?\s*', row):
             problems.append((number, 'Unexpanded verse reference'))
-        if re.search(r'\w {2,}\w', TAG.sub('', row)):
+        if re.search(r'\w {2,}\w', row):
             problems.append((number, 'Repeated spaces between lyric characters'))
         if verse is not None:
             verse.append((number, row))

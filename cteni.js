@@ -126,9 +126,8 @@ function meta(text,key){var lines=text.split(/\r?\n/);for(var k=0;k<lines.length
 function drawLine(line,lang,seen){
  var row=make('div',undefined,line.indexOf('[')<0?'line lyrics-only':'line');
  line=line.trim().replace(/^(\[[^\]]+\])\s+(?=[A-Za-zÀ-ž])/, '$1').replace(/\](?=\[)/g,'] ');
- var lastMark=null,offset=0;
  line.split(/\s+/).forEach(function(word,i){
-  if(i)offset++;
+  var lastMark=null,offset=0;
   if(i)row.appendChild(document.createTextNode(' '));
   var w=make('span',undefined,'word'),rx=/\[([^\]]+)\]([^\[]*)/g,m,first=word.indexOf('[');
   if(first!==0)w.appendChild(document.createTextNode(first<0?word:word.slice(0,first)));
@@ -140,21 +139,19 @@ function drawLine(line,lang,seen){
    if(lastMark){
     var missing=lastMark.width-(offset-lastMark.offset);
     if(missing>0){
-     var spacer=lastMark.word===w?lastMark.chunk:lastMark.word;
-     spacer.style.paddingRight=missing+'ch';
+     lastMark.chunk.style.paddingRight=missing+'ch';
     }
    }
-   lastMark={offset:offset,width:c.length*.96+.9,chunk:chunk,word:w};
+   lastMark={offset:offset,width:c.length*.96+.9,chunk:chunk};
    offset+=m[2].length;
    var lane=make('span',undefined,'chord-lane');
    lane.appendChild(make('span',c,'ch'));chunk.appendChild(lane);
    chunk.appendChild(document.createTextNode(m[2]||'\u200b'));w.appendChild(chunk);
   }
+  if(lastMark && offset-lastMark.offset<lastMark.width)w.style.paddingRight=(lastMark.width-offset+lastMark.offset)+'ch';
+  if(word.replace(/\[[^\]]+\]/g,'').length>20)w.className+=' long-word';
   row.appendChild(w);
  });
- if(lastMark && offset-lastMark.offset<lastMark.width){
-  lastMark.word.style.paddingRight=(lastMark.width-offset+lastMark.offset)+'ch';
- }
  return row;
 }
 // Frets run from the low E string to the high E string. -1 mutes a string.
@@ -257,6 +254,15 @@ function render(){var s=current,score=el('score'),ch=[];clear(score);el('title')
  var rows=s.cho.split(/\r?\n/), verseLabel=false,sectionName='',tab=null;
  rows.forEach(function(line,i){
   var d=directive(line);
+  if(d && d[1]==='image'){
+   var source=/^src="(tabs\/[a-z0-9-]+\.png)"$/.exec(d[2]||'');
+   if(source && s.tabImages && s.tabImages[source[1]]){
+    var panel=make('details'),pic=make('img');panel.appendChild(make('summary',t('Tabulatura','Guitar tab')));
+    pic.alt=t('Prstoklad z předlohy','Fingering from the source arrangement');
+    pic.src='data:image/png;base64,'+s.tabImages[source[1]];pic.style.maxWidth='100%';panel.appendChild(pic);score.appendChild(panel);
+   }
+   return;
+  }
   if(d && /^(start_of_tab|sot)$/.test(d[1])){
    var details=make('details');details.appendChild(make('summary',t('Tabulatura','Guitar tab')));
    tab=make('pre');tab.style.overflowX='auto';details.appendChild(tab);score.appendChild(details);return;

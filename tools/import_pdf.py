@@ -7,8 +7,46 @@ import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from check_arrangements import notation_issue
+
 CHORD = re.compile(r'(?:[A-H](?:#|b|is|es)?(?:maj|min|mi|dim|aug|sus|add|m|[0-9+#()-])*(?:/[A-H][#b]?)?|N\.C\.)')
 SECTION = re.compile(r'\[(.{1,48})\]|((?:intro|verse|chorus|bridge|outro|sloka|refrén)(?:\s+\d+)?)\s*:?', re.I)
+
+
+def reading_order(words, width, tolerance):
+    """Keep simultaneous lines in separate columns when both have a stable left margin."""
+    rows = []
+    for y, x, end, text in sorted(words):
+        if not rows or y - rows[-1][0] > tolerance:
+            rows.append((y, []))
+        rows[-1][1].append((x, end, text))
+    lines = [sorted(row) for _, row in rows]
+    # A chorus aligned at the right of one line is insufficient evidence of two columns.
+    # Look for a repeated right-column start on text rows, with an empty gutter before it.
+    starts = []
+    for row in lines:
+        for i in range(1, len(row)):
+            x = row[i][0]
+            if (.47 * width <= x <= .60 * width and x-row[i-1][1] > width*.025
+                    and any(len(w[2]) >= 3 for w in row[:i])
+                    and any(len(w[2]) >= 3 for w in row[i:])):
+                starts.append(x)
+    if not starts:
+        return lines
+    margin = max(starts, key=lambda x: sum(abs(x-y)<width*.009 for y in starts))
+    if sum(abs(x-margin)<width*.009 for x in starts) < 3:
+        return lines
+    cut = margin-width*.012
+    body = [line for line in lines if line[-1][1] > margin]
+    if sum(any(x < cut < end for x,end,_ in row) for row in body) > max(2, len(body)*.10):
+        return lines
+    columns = []
+    for right in (False, True):
+        for row in lines:
+            part = [w for w in row if (w[0] >= cut) == right]
+            if part:
+                columns.append(part)
+    return columns
 
 
 def read_pages(path):
@@ -23,23 +61,22 @@ def read_pages(path):
             if sum(len(line) for line in lines) >= 5:
                 words = sorted((float(w.get('yMax')), float(w.get('xMin')), float(w.get('xMax')), w.text or '')
                                for w in page.findall('.//{*}word'))
-                rows = []
-                for y, x, end, text in words:
-                    if not rows or y - rows[-1][0] > 3:
-                        rows.append((y, []))
-                    rows[-1][1].append((x, end, text))
-                pages.append([sorted(row) for _, row in rows])
+                pages.append(reading_order(words, float(page.get('width')), 3))
             else:
                 prefix = str(Path(tmp) / 'page')
                 subprocess.run(['pdftoppm','-f',str(number),'-l',str(number),'-singlefile','-r','220','-gray','-png',str(path),prefix],check=True)
                 with open(prefix+'.png','rb') as image:
                     data = subprocess.check_output(['tesseract','stdin','stdout','-l','eng+ces','--psm','6','tsv'],stdin=image)
-                rows = {}
+                words = []
+                width = 0
                 for w in csv.DictReader(io.StringIO(data.decode()),delimiter='\t',quoting=csv.QUOTE_NONE):
+                    if w['level']=='1':
+                        width = int(w['width'])
                     if w['level']=='5' and w['text'].strip():
-                        x=int(w['left'])
-                        rows.setdefault((w['block_num'],w['par_num'],w['line_num']),[]).append((x,x+int(w['width']),w['text']))
-                pages.append(list(rows.values()))
+                        x = int(w['left'])
+                        y = int(w['top']) + int(w['height'])
+                        words.append((y, x, x+int(w['width']), w['text']))
+                pages.append(reading_order(words, width, max(4,width*.004)))
     return pages
 
 
@@ -68,8 +105,9 @@ def align(words, chords):
         coords.extend(x+(end-x)*i/len(w) for i in range(len(w)))
         coords.append(end)
     # Chords to the right of the last word are instrumental beats.
+    lyric_length = len(text)
     for x,chord in reversed(chords):
-        pos = len(text) if x >= coords[-1] else min(range(len(coords)),key=lambda i:abs(coords[i]-x))
+        pos = lyric_length if x >= coords[-1] else min(range(len(coords)),key=lambda i:abs(coords[i]-x))
         text = text[:pos]+'['+chord+']'+text[pos:]
     return text
 
@@ -99,7 +137,7 @@ def convert(path, artist, title):
             if heading and not chords:
                 out.extend(['','{comment: '+(heading[1] or heading[2])+'}'])
         else:
-            if not re.search(r'[^\W\d_]{2}',s) or re.search(r'https?://|\{.*\}',s):
+            if notation_issue(s) or not re.search(r'[^\W\d_]{2}',s) or re.search(r'\{.*\}',s):
                 raise ValueError('Unrecognized notation; check this sheet manually')
             if pending:
                 pairs += 1
