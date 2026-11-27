@@ -12,6 +12,8 @@ Use **Sort by** to list titles alphabetically, by the original file timestamp pr
 
 Select **Play mode** to hide the controls. Scroll vertically or use **Next page** at the bottom right to advance to the next group of rendered rows. Wrapped chord and lyric rows stay together, and there is room to scroll through expanded tablature. Page Up, Page Down and the arrow keys also turn pages. Change the text size with A−/A+ or pinch the score on a touch screen. The reader remembers the zoom for each song on this device. Open **Song settings** to adjust text size, transposition or capo. Changes are saved automatically on this device. Tap the transposition number between − and + to restore the original key.
 
+In play mode, open **Playback** to start auto-scroll and set its speed. You can drag the score by hand in either direction. Auto-scroll resumes after the gesture and its momentum end, and stops at the end of the song. The silent **Metronome** pulses in the top bar at the selected tempo. Close the playback controls to give the music more space. Speed and tempo are remembered on this device, and exiting play mode stops both features.
+
 Long-press a line, right-click it, or focus it and press Enter to report a missing chord, a misplaced chord, or incorrect lyrics. Reports stay in this browser until you export them together from **Library tools → Export reports**. Send the exported JSON to share your corrections.
 
 The [automatic arrangement checks](./ARRANGEMENT-CHECKS.md) run on every publication and link directly to lines that may need a correction.

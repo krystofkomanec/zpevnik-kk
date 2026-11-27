@@ -563,7 +563,7 @@ var pages=[],pageTail,layoutFrame=0;
 function pageState(){
  if(!document.body.classList.contains('playing'))return;
  var area=el('score'),position=area.scrollTop;
- var page=pages.find(function(page){return Math.abs(Math.floor(page.start)-position)<.5});
+ var page=!scrollFrame && pages.find(function(page){return Math.abs(Math.floor(page.start)-position)<.5});
  var gap=page?Math.max(0,area.clientHeight-(page.end-position)):0;
  var frame=el('score-frame');
  frame.style.setProperty('--page-gap',gap+'px');
@@ -634,7 +634,64 @@ function measurePages(){
 function schedulePages(){
  if(document.body.classList.contains('playing') && !layoutFrame)layoutFrame=requestAnimationFrame(measurePages);
 }
+var scrollFrame=0, previousTick=0, scrollRemainder=0, touchingScore=false, resumeAfter=0;
+var scrollArea=el('score');
+function configureSlider(id,unit,onChange){
+ var input=el(id),output=document.querySelector('output[for="'+id+'"]');
+ input.value=get(id,input.value);
+ function update(){
+  output.textContent=input.value+' '+unit;
+  if(onChange)onChange(Number(input.value));
+ }
+ input.oninput=function(){update();save(id,input.value)};
+ update();
+}
+configureSlider('scroll-speed','px/s');
+configureSlider('beat-tempo','BPM',function(bpm){el('beat').style.setProperty('--beat-period',(60000/bpm)+'ms')});
+function setAutoScroll(on){
+ cancelAnimationFrame(scrollFrame);
+ previousTick=0;scrollRemainder=0;resumeAfter=0;
+ scrollFrame=on?requestAnimationFrame(scrollTick):0;
+ el('auto-scroll').setAttribute('aria-pressed',String(on));
+ pageState();
+}
+function scrollTick(now){
+ var elapsed=previousTick?Math.min(80,now-previousTick):0;
+ previousTick=now;
+ if(!touchingScore && now>=resumeAfter && !selectedLine && !document.hidden){
+  resumeAfter=0;
+  var bottom=scrollArea.scrollHeight-(pageTail?pageTail.offsetHeight:0)-scrollArea.clientHeight;
+  if(scrollArea.scrollTop>=bottom-0.5){setAutoScroll(false);return}
+  scrollRemainder+=Number(el('scroll-speed').value)*elapsed/1000;
+  var step=Math.floor(scrollRemainder);
+  if(step){scrollArea.scrollTop=Math.min(bottom,scrollArea.scrollTop+step);scrollRemainder-=step}
+ }
+ scrollFrame=requestAnimationFrame(scrollTick);
+}
+function yieldToScroll(){if(scrollFrame)resumeAfter=performance.now()+700}
+scrollArea.addEventListener('touchstart',function(){touchingScore=true;yieldToScroll()},{passive:true});
+function releaseTouch(e){touchingScore=e.touches.length>0;yieldToScroll()}
+scrollArea.addEventListener('touchend',releaseTouch);
+scrollArea.addEventListener('touchcancel',releaseTouch);
+scrollArea.addEventListener('wheel',yieldToScroll,{passive:true});
+scrollArea.addEventListener('scroll',function(){if(resumeAfter)yieldToScroll()});
+function setMetronome(on){
+ el('metronome').setAttribute('aria-pressed',String(on));
+ el('beat').hidden=!on;
+}
+el('auto-scroll').onclick=function(){setAutoScroll(!scrollFrame)};
+el('metronome').onclick=function(){setMetronome(el('beat').hidden)};
+el('play-controls-toggle').onclick=function(){
+ var controls=el('play-controls');
+ controls.hidden=!controls.hidden;
+ this.setAttribute('aria-expanded',String(!controls.hidden));
+ schedulePages();
+};
 function playMode(on){
+ if(!on){
+  setAutoScroll(false);setMetronome(false);touchingScore=false;
+  el('play-controls').hidden=true;el('play-controls-toggle').setAttribute('aria-expanded','false');
+ }
  document.body.classList.toggle('playing',on);
  el('play').setAttribute('aria-pressed',String(on));
  el('play').textContent=on?t('Zavřít hraní','Exit play mode'):t('Režim hraní','Play mode');
@@ -648,6 +705,7 @@ function playMode(on){
 el('play').onclick=function(){playMode(!document.body.classList.contains('playing'))};
 el('exit-play').onclick=function(){playMode(false);el('play').focus()};
 function turnPage(direction){
+ yieldToScroll();
  var area=el('score');
  if(layoutFrame){cancelAnimationFrame(layoutFrame);measurePages()}
  var position=area.scrollTop,ordered=direction>0?pages:pages.slice().reverse();
@@ -658,7 +716,10 @@ function turnPage(direction){
 el('score').addEventListener('scroll',pageState);
 el('score').addEventListener('toggle',schedulePages,true);
 el('score').addEventListener('load',schedulePages,true);
-window.addEventListener('resize',schedulePages);
+window.addEventListener('resize',function(){
+ if(layoutFrame)cancelAnimationFrame(layoutFrame);
+ measurePages();
+});
 if(window.ResizeObserver)new ResizeObserver(schedulePages).observe(el('score-frame'));
 el('prev-page').onclick=function(){turnPage(-1)};
 el('next-page').onclick=function(){turnPage(1)};

@@ -315,6 +315,7 @@ test('repaginates after a touch zoom, rotation, and expansion of oversized tabla
   });
   await expect(page.locator('#score')).toHaveCSS('font-size', '36px');
   await page.setViewportSize({width: 650, height: 390});
+  await expect.poll(async () => (await visibleScore(page)).clipped).toEqual([]);
   await expect(page.locator('#next-page')).toBeEnabled();
   await inspectPages(page, () => page.keyboard.press('ArrowDown'));
 
@@ -336,4 +337,34 @@ test('repaginates after a touch zoom, rotation, and expansion of oversized tabla
   }
   expect(bottomReached).toContain(true);
   await expect(page.locator('#next-page')).toBeDisabled();
+});
+
+test('auto-scroll yields to touch and stops at the end; the visual beat is independent', async ({page}) => {
+  await page.setViewportSize({width:360,height:690});
+  await openOffline(page);
+  await install(page,[{...englishSong,cho:longScore}]);
+  await page.locator('#play').click();
+  await page.locator('#play-controls-toggle').click();
+  const speed=page.locator('#scroll-speed'), tempo=page.locator('#beat-tempo');
+  await speed.fill('80');await tempo.fill('120');
+  await page.locator('#metronome').click();
+  await expect(page.locator('#beat')).toHaveCSS('animation-duration','0.5s');
+  await page.locator('#auto-scroll').click();
+  const score=page.locator('#score'),top=()=>score.evaluate(e=>e.scrollTop);
+  await expect.poll(top).toBeGreaterThan(30);
+  await score.evaluate(el=>{const touch=new Touch({identifier:0,target:el,clientX:50,clientY:300});el.dispatchEvent(new TouchEvent('touchstart',{touches:[touch]}))});
+  await score.evaluate(e=>{e.scrollTop=12});
+  await page.waitForTimeout(250);
+  expect(await top()).toBe(12);
+  await score.dispatchEvent('touchend',{touches:[]});
+  await expect.poll(top).toBeGreaterThan(25);
+  await page.locator('#play-controls-toggle').click();
+  await expect(page.locator('#beat')).toBeVisible();
+  await score.evaluate(e=>{e.scrollTop=e.scrollHeight});
+  await expect(page.locator('#auto-scroll')).toHaveAttribute('aria-pressed','false');
+  await expect(page.locator('#beat')).toBeVisible();
+  await page.locator('#exit-play').click();
+  await expect(page.locator('#beat')).toBeHidden();
+  await page.reload();await page.locator('#play').click();await page.locator('#play-controls-toggle').click();
+  await expect(speed).toHaveValue('80');await expect(tempo).toHaveValue('120');
 });

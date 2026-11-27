@@ -1028,3 +1028,16 @@ input:focus-visible,select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+#playing-title { flex: 1; min-width: 0 }
+#play-bar button { flex: none }
+#play-controls { flex: none; padding: 4px 12px; background: var(--surface); border-bottom: 1px solid var(--edge) }
+#play-controls > div { display: flex; gap: 8px; align-items: center; margin: 3px 0 }
+#play-controls button { min-width: 96px }
+#play-controls button[aria-pressed=true] { background: var(--accent); color: var(--paper) }
+#play-controls label { display: flex; flex: 1; align-items: center; gap: 6px; font-size: .8rem }
+#play-controls input { min-width: 0; width: 100%; max-width: 12rem; flex: 1; accent-color: var(--accent) }
+#play-controls output { min-width: 5em; font-variant-numeric: tabular-nums }
+#beat { color: var(--accent); animation: beat-pulse var(--beat-period,667ms) linear infinite; }
+@keyframes beat-pulse { 0%,100% { transform: translateY(3px) } 18% { transform: translateY(-4px) } }
+@media(max-width:480px){ .playing #play-bar { padding: 4px 8px; gap: 6px } #play-bar button { padding: 5px 8px; font-size: .84rem } }
