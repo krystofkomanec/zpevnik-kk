@@ -8,10 +8,11 @@ function save(k,v){try{localStorage.setItem('zpevnik.'+k,v)}catch(e){}}
 function fold(s){s=s.toLowerCase();return s.normalize?s.normalize('NFD').replace(/[\u0300-\u036f]/g,''):s}
 var size=Math.min(40,Math.max(14,Number(get('text','21'))||21)),dark=get('dark','0')==='1',current,shift=0;
 var order=el('library-order');
-order.value=get('order','title');if(!order.value)order.value='title';
+var savedOrder=get('order','title');
+order.value=savedOrder==='added'?'source':savedOrder;if(!order.value)order.value='title';
 function songDate(song){
- if(order.value==='source')return song.sourceDate||'';
- if(order.value==='added'){
+ if(order.value==='source')return song.sourceTimestamp||song.sourceDate||'';
+ if(order.value==='imported'){
   if(song.addedAt)return song.addedAt;
   var first=(song.changes||[]).filter(function(c){return c.revision===1})[0];
   return first?first.date:'';
@@ -79,9 +80,14 @@ function list(){
   if(!visible(s)||fold(s.title+' '+s.artist).indexOf(q)<0)return;
   var b=make('button',s.title,'item');b.appendChild(make('small',s.artist||''));
   if(order.value!=='title'){
-   var stamp=songDate(s),date=stamp?new Date(stamp):null;
-   var day=order.value==='source' && stamp?new Date(stamp+'T12:00:00'):date;
-   b.appendChild(make('small',day && isFinite(day.getTime())?day.toLocaleDateString(t('cs-CZ','en-GB')):t('Datum neznámé','Date unknown')));
+   var stamp=songDate(s),hasTime=stamp.indexOf('T')!==-1;
+   var day=new Date(hasTime?stamp:stamp+'T12:00:00');
+   var locale=t('cs-CZ','en-GB'),label=t('Datum neznámé','Date unknown');
+   if(isFinite(day.getTime())){
+    label=day.toLocaleDateString(locale);
+    if(hasTime)label+=' · '+(order.value==='source'?stamp.slice(11,16):day.toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit',hour12:false}));
+   }
+   b.appendChild(make('small',label));
   }
   b.dataset.file=s.file;b.setAttribute('aria-current',s===current?'true':'false');
   b.onclick=function(){openSong(s,b)};box.appendChild(b);count++;

@@ -166,6 +166,8 @@ def build():
             song['addedAt'] = added
         if prior and prior.get('sourceDate'):
             song['sourceDate'] = prior['sourceDate']
+            if prior.get('sourceTimestamp'):
+                song['sourceTimestamp'] = prior['sourceTimestamp']
         song.update(revision=revision,changes=changes)
     songs=list(by_file.values())
     update_readme(catalog,songs)

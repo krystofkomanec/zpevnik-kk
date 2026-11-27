@@ -8,7 +8,7 @@ Open the downloaded `index.html` in your browser on a tablet, phone, or computer
 
 Search the library by song title or artist. On smaller screens, the menu button opens the library. Expand **Guitar chords** to see six-string chord shapes, including open and muted strings. Use the song controls to transpose or resize the text. The header lets you switch appearance and language. **English** shows songs with English lyrics, while **Čeština** shows the full collection. Both modes use Czech chord names (H and B).
 
-Use **Sort by** to list titles alphabetically, by date added to the songbook, or by the original file date preserved in the downloaded ZIP. Date sorts show newest first. Missing dates appear last. Songs from the same import are ordered by title. Edits keep the original addition date.
+Use **Sort by** to list titles alphabetically, by the original file timestamp preserved in the downloaded ZIP, or by import time in the app. Date sorts show newest first. Missing dates appear last. Songs from the same import are ordered by title. Edits keep the original addition date.
 
 Select **Play mode** to hide the controls. Landscape screens at least 700 pixels wide display two columns. Tap the screen edges or use the arrow keys to turn pages. Choose **Save** beside the transposition controls to remember the displayed offset for this song. Clicking the checked button clears it.
 
