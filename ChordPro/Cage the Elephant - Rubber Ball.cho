@@ -10,9 +10,9 @@
 |----3-3-3----3-3-3--|
 |----3-3-3--3--------| x2
 |--1-----------------|
-{end_of_tab}
 strum p d u d  p d u d
 count 1 e & a  2 e & a
+{end_of_tab}
 [Am]
 {start_of_tab}
 |-----0-0-0----0-0-0--|
@@ -21,9 +21,9 @@ count 1 e & a  2 e & a
 |-----2-2-2--2-2-2-2--|
 |---0-----------------| x2
 |---------------------|
-{end_of_tab}
 p d u d  p d u d
 1 e & a  2 e & a
+{end_of_tab}
 OR you can play it like this since the
 middle stroke isnt really noticed that
 much
@@ -34,9 +34,9 @@ much
 |----3-3----3-3--|
 |----3-3--3------| x2
 |--1-------------|
-{end_of_tab}
 strum p d d  p d d
 count 1 & a  2 & a
+{end_of_tab}
 {start_of_tab}
 |-----0-0----0-0--|
 |-----1-1----1-1--|
@@ -44,9 +44,9 @@ count 1 & a  2 & a
 |-----2-2--2-2-2--|
 |---0-------------| x2
 |-----------------|
-{end_of_tab}
 p d d  p d d
 1 & a  2 & a
+{end_of_tab}
 
 {comment: Chorus}
 (play the same way and same count as
@@ -124,7 +124,7 @@ Then they'll see
 
 {comment: Bridge}
 [F] [Am] (x4)
-switch every  4\4measure
+switch every 4/4 measure
 (meanwhile strange oprah-lady sounds are
 going)
 
