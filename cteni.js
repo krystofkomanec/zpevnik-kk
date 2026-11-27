@@ -193,6 +193,13 @@ function render(){var s=current,score=el('score'),ch=[];clear(score);el('title')
    row.className+=' progression';
    row.appendChild(make('div',next.trim(),'progression-text'));
   }else if(i && score.lastChild && score.lastChild.classList.contains('progression') && /^\s*(?:\[[^\]]+\]\s*)+$/.test(rows[i-1]))return;
+  // Respect stanza breaks between sung lines without detaching a chord-only line.
+  if(i && !rows[i-1].trim() && score.lastChild && score.lastChild.classList.contains('line')){
+   var previous=i-1;
+   while(previous>=0 && !rows[previous].trim())previous--;
+   function hasLyric(value){return /[A-Za-zÀ-ž]/.test(value.replace(/\[[^\]]*\]/g,''))}
+   if(previous>=0 && hasLyric(rows[previous]) && hasLyric(line))row.style.marginTop='.9em';
+  }
   score.appendChild(row);
  });
  chartSymbols=ch;el('guitar').hidden=!ch.length;el('chords').textContent=ch.join(' · ');showCharts();el('pitch').textContent=(shift>0?'+':'')+shift;el('small').disabled=size<=14;el('big').disabled=size>=40;el('down').disabled=shift<=-12;el('up').disabled=shift>=12}
