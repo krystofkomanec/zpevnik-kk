@@ -200,5 +200,75 @@ el('catalog-search').oninput=updateOverview;
 function resize(d){size=Math.max(14,Math.min(40,size+d));save('text',size);render()}
 el('small').onclick=function(){resize(-2)};el('big').onclick=function(){resize(2)};
 el('up').onclick=function(){shift=Math.min(12,shift+1);render()};el('down').onclick=function(){shift=Math.max(-12,shift-1);render()};el('pitch').onclick=function(){shift=0;render()};
+var cacheKey='zpevnik.library.v1';
+function validateLibrary(data){
+ if(!data || data.schema!==1 || typeof data.version!=='number' || data.version<1 ||
+    data.version%1!==0 || !Array.isArray(data.songs) || !data.songs.length || !Array.isArray(data.catalog))throw Error('format');
+ if(!data.songs.every(function(s){return s && typeof s.title==='string' && typeof s.artist==='string' &&
+    typeof s.file==='string' && typeof s.cho==='string' && s.cho.length>0}) ||
+    !data.catalog.every(function(r){return r && typeof r.name==='string'}))throw Error('format');
+}
+function useLibrary(data){
+ songs=data.songs;catalog=data.catalog;libraryVersion=data.version;
+ songs.sort(function(a,b){return a.title.localeCompare(b.title,'cs')});
+}
+try{
+ var stored=JSON.parse(localStorage.getItem(cacheKey));
+ if(stored && stored.version>libraryVersion){validateLibrary(stored);useLibrary(stored)}
+}catch(ignore){}
+function updateMessage(cs,en){
+ var status=el('update-status');status.hidden=false;status.textContent=t(cs,en);
+}
+function installLibrary(data){
+ validateLibrary(data);
+ if(data.version<=libraryVersion){
+  el('update-fallback').hidden=true;
+  updateMessage('Už máš nejnovější dostupná data.','Your library is already up to date.');return;
+ }
+ // Write the complete replacement before changing the current view.
+ try{localStorage.setItem(cacheKey,JSON.stringify(data))}
+ catch(error){updateMessage('Data se nepodařilo uložit. Stáhni si nové vydání aplikace.','Unable to save offline data. Download the latest app release.');return}
+ var selected=current.file;
+ useLibrary(data);
+ current=songs.filter(function(s){return s.file===selected && visible(s)})[0] || songs.filter(visible)[0] || songs[0];
+ list();render();updateOverview();refreshUsage();el('update-fallback').hidden=true;
+ updateMessage('Aktualizováno. Skladeb v knihovně: '+songs.length,'Updated. Songs in the library: '+songs.length);
+}
+var sessionToken='';
+el('private-update').onclick=function(){
+ sessionToken=el('library-token').value.trim();el('library-token').value='';
+ if(sessionToken)el('update-library').click();
+};
+el('update-library').onclick=function(){
+ var button=this;button.disabled=true;el('private-update').disabled=true;
+ updateMessage('Kontroluji nové skladby…','Checking for new songs…');
+ var request=new XMLHttpRequest();
+ function failed(){
+  button.disabled=false;el('private-update').disabled=false;el('update-fallback').hidden=false;
+  updateMessage('Knihovna je dál dostupná offline. Pro aktualizaci zkontroluj připojení nebo stáhni a načti soubor níže.',
+   'Your offline library is available. To update, check your connection or download and load the file below.');
+ }
+ request.onload=function(){
+  button.disabled=false;el('private-update').disabled=false;
+  if(request.status!==200){failed();return}
+  try{installLibrary(JSON.parse(request.responseText))}catch(error){failed()}
+ };
+ request.onerror=request.ontimeout=failed;
+ var url=sessionToken?'https://api.github.com/repos/krystofkomanec/zpevnik-kk/contents/library.json?ref=main&v=':'https://raw.githubusercontent.com/krystofkomanec/zpevnik-kk/main/library.json?v=';
+ request.open('GET',url+Date.now(),true);
+ if(sessionToken){
+  request.setRequestHeader('Accept','application/vnd.github.raw+json');
+  request.setRequestHeader('Authorization','Bearer '+sessionToken);
+ }
+ request.timeout=20000;request.send();
+};
+el('update-file').onchange=function(){
+ var input=this,file=input.files[0];if(!file)return;
+ var reader=new FileReader();
+ function failed(){updateMessage('Soubor knihovny se nepodařilo načíst.','Could not load the library file.')}
+ reader.onload=function(){try{installLibrary(JSON.parse(reader.result))}catch(error){failed()}};
+ reader.onerror=failed;reader.readAsText(file);input.value='';
+};
+
 translatePage();theme();openSong(songs.filter(function(s){return s.title==='Runaway'})[0],true);
 })();
