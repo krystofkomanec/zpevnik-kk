@@ -293,7 +293,7 @@ function render(){var s=current,score=el('score'),ch=[];clear(score);el('title')
   }
   score.appendChild(row);
  });
- groupStanzas(score);markReports(score);pitchState();chartSymbols=ch;el('guitar').hidden=!ch.length;el('chords').textContent=ch.join(' · ');showCharts();el('pitch').textContent=(shift>0?'+':'')+shift;el('small').disabled=size<=14;el('big').disabled=size>=40;el('down').disabled=shift<=-12;el('up').disabled=shift>=12}
+ groupStanzas(score);markReports(score);chartSymbols=ch;el('guitar').hidden=!ch.length;el('chords').textContent=ch.join(' · ');showCharts();el('pitch').textContent=pitchText(shift);el('pitch-hint').hidden=!shift;el('pitch-hint').textContent=pitchText(shift);el('small').disabled=size<=14;el('big').disabled=size>=40;el('down').disabled=shift<=-12;el('up').disabled=shift>=12}
 }
 function capoSetting(original){
  var select=el('capo-fret'),stored=get('capo.'+current.file,'');
@@ -322,21 +322,21 @@ function storedPitch(){
  return value!==null && /^-?\d+$/.test(value) && Math.abs(Number(value))<=12?Number(value):null;
 }
 function pitchText(n){return (n>0?'+':'')+n}
-function pitchState(){
- var saved=storedPitch(),button=el('save-pitch'),matches=saved===shift;
- button.setAttribute('aria-pressed',String(matches));
- button.textContent=matches?t('✓ Uloženo ','✓ Saved ')+pitchText(saved):t('Uložit ','Save ')+pitchText(shift);
- el('saved-pitch').textContent=saved===null?t('Neuloženo','Not saved'):matches?'':t('Uloženo ','Saved ')+pitchText(saved);
- button.title=matches?t('Zrušit uložení tóniny','Forget saved key'):t('Uložit pro tuto skladbu','Remember for this song');
+function showSongSettings(open){
+ el('song-settings').hidden=!open;
+ el('song-settings-button').setAttribute('aria-expanded',String(open));
 }
-el('save-pitch').onclick=function(){
+el('song-settings-button').onclick=function(){showSongSettings(el('song-settings').hidden)};
+function setPitch(value){
+ var next=Math.max(-12,Math.min(12,value));
  try{
   var key='zpevnik.pitch.'+current.file;
-  if(storedPitch()===shift)localStorage.removeItem(key);else localStorage.setItem(key,String(shift));
-  pitchState();
- }catch(error){el('saved-pitch').textContent=t('Nelze uložit','Could not save')}
-};
+  if(next===0)localStorage.removeItem(key);else localStorage.setItem(key,String(next));
+ }catch(error){el('status').textContent=t('Transpozici se nepodařilo uložit.','Could not save transposition.');return}
+ shift=next;render();
+}
 function loadSongSettings(){
+ showSongSettings(false);
  shift=storedPitch()||0;
  size=Math.min(40,Math.max(14,Number(get('zoom.'+current.file,get('text','21')))||21));
 }
@@ -548,7 +548,7 @@ function endPinch(e){
 scoreBox.addEventListener('touchend',endPinch);
 scoreBox.addEventListener('touchcancel',endPinch);
 el('small').onclick=function(){resize(-2)};el('big').onclick=function(){resize(2)};
-el('up').onclick=function(){shift=Math.min(12,shift+1);render()};el('down').onclick=function(){shift=Math.max(-12,shift-1);render()};el('pitch').onclick=function(){shift=0;render()};
+el('up').onclick=function(){setPitch(shift+1)};el('down').onclick=function(){setPitch(shift-1)};el('pitch').onclick=function(){setPitch(0)};
 var cacheKey='zpevnik.library.v1';
 function validateLibrary(data){
  if(!data || data.schema!==1 || typeof data.version!=='number' || data.version<1 ||

@@ -10,7 +10,7 @@ Search the library by song title or artist. On smaller screens, the menu button 
 
 Use **Sort by** to list titles alphabetically, by the original file timestamp preserved in the downloaded ZIP, or by import time in the app. Date sorts show newest first. Missing dates appear last. Songs from the same import are ordered by title. Edits keep the original addition date.
 
-Select **Play mode** to hide the controls. Scroll vertically or use **Next page** at the bottom right to advance by one visible page of music. Page Up, Page Down and the arrow keys also turn pages. Change the text size with A−/A+ or pinch the score on a touch screen. The reader remembers the zoom for each song on this device. Choose **Save** beside the transposition controls to remember the displayed offset for this song. Clicking the checked button clears it.
+Select **Play mode** to hide the controls. Scroll vertically or use **Next page** at the bottom right to advance by one visible page of music. Page Up, Page Down and the arrow keys also turn pages. Change the text size with A−/A+ or pinch the score on a touch screen. The reader remembers the zoom for each song on this device. Open **Song settings** to adjust text size, transposition or capo. Changes are saved automatically on this device. Tap the transposition number between − and + to restore the original key.
 
 Long-press a line, right-click it, or focus it and press Enter to report a missing chord, a misplaced chord, or incorrect lyrics. Reports stay in this browser until you export them together from **Library tools → Export reports**. Send the exported JSON to share your corrections.
 
