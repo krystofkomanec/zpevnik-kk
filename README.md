@@ -24,7 +24,7 @@ Uploaded PDFs are stored in the repository and inherit its visibility.
 ## Library statistics
 
 <!-- statistics:start -->
-**600 songs** · 0 added · 1 revisions since tracking began.
+**600 songs** · 0 added · 83 revisions since tracking began.
 
 ```mermaid
 pie showData
@@ -38,11 +38,93 @@ The initial 600 arrangements form the baseline. Each subsequent entry records th
 ### Published changes by month
 
 ```text
-2026-11  ████████████████████████  0 added · 1 updated
+2026-11  ████████████████████████  0 added · 83 updated
 ```
 
 | Date | Song | Change | Revision | Contributor |
 |---|---|---|---:|---|
+| 2026-11-27 | Druhá tráva – Sbohem Angelíno | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Kamelot – Fénix | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Čechomor – Tady jsem doma | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Michal Hrůza – Jsi má baletka, co tančí | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Filmová Hudba Cz – Chodí horou 300 ovec | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Václav Neckář – Časy se mění | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Karel Plíhal – Akordy | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Druhá tráva – Jak mlýn se točí svět | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Ivan Mládek – Dívka s modrou matrací | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Druhá tráva – Dřív než se rozloučíme | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Kamil Střihavka – Země vzdálená | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Ivan Mládek – Dívka s dolíčky | Updated | 2 | krystofkomanec |
+| 2026-11-27 | František Nedvěd – Třetí pokus | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Hana Zagorová – Málokdo ví | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Jakub Smolík – Zahrada ticha | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Bluesberry – Za sto let | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Hana Hegerová – Čerešne | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Vladimír Mišík – Jednohubky | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Petr Hapka – Na Hotelu V Olomouci | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Druhá tráva – Odpočiň si, Sáro (verze 2) | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Jelen – Klidná jako voda | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Druhá tráva – Ještě není tma | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Lidové písně – A te Rehradice | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Druhá tráva – Dívka ze severu | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Vladimír Mišík – Stříhali dohola malého chlapečka | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Čechomor – Hej, bystrá voda | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Druhá tráva – Čeká nás poslední ráno (One Too Many Mornings) | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Záviš – Čepice | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Druhá tráva – Až si jednou | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Mňága &amp; Žďorp – Nagasaki Hirošima | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Záviš – Cukrářská | Updated | 2 | krystofkomanec |
+| 2026-11-27 | The Animals – The House of the Rising Sun | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Čechomor – Stojí hruška v širém poli | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Druhá tráva – Marcipán z Toleda | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Čechomor – Proměny | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Cirkus Praha | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Černej pasažér | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Deža ví | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Doma nejlíp | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Duchové zemřelých | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Dva rychlý vlaky | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Historka z podsvětí | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Jaromil Hodněpil | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Jdu krajinou | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Kantorovy varhany | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Koleda | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Kolotoč | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Lano, co k nebi nás poutá | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Leží dáma na kolejích | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Marie! | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Markéto! | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Měla jsem já pejska | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Milovaný syn | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Moji učitelé | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Mraky | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Na širém moři | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Nad Koločavou | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Nejsem sám | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Namám rád trpaslíky | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Nezdárný syn | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Obešel jsem horu | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Orel &amp; panna | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Pálíš, doutnáš, nehoříš | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Paní domácí | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Pět prstů | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Ponorná řeka | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Princezna Lada | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Přijíždí posel | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Ranní rány | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Romeo &amp; Julie po dvaceti letech | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Tak to mám rád | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Taková ženská | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Tlustý muž | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – V jejích šlépějích | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – V oku dravce | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Ve zlatém kočáře | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Vetřelec | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Viděl jsem člověka | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Vraťte mi mou hlavu | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Zlá/sky | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Mňága &amp; Žďorp – Měsíc | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Michal Prokop – Blues o spolykaných slovech | Updated | 2 | krystofkomanec |
 | 2026-11-27 | Tradiční – Bella Ciao | Updated | 2 | krystofkomanec |
 <!-- statistics:end -->
 
