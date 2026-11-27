@@ -586,11 +586,26 @@ h1 {
   transform: rotate(225deg);
 }
 #charts {
+  margin: 8px 0 16px;
+  padding: 12px;
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+}
+.chart-picker, .chart-modes, .chart-options {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 10px;
+  gap: 6px;
 }
+.chart-picker button, .chart-modes button {
+  min-height: 40px;
+  border-color: var(--edge);
+}
+.chart-picker button { min-width: 42px; font-weight: 650 }
+.chart-modes { margin: 10px 0; border-top: 1px solid var(--edge); padding-top: 8px }
+.chart-modes button { font-size: .82rem; padding: 4px 8px }
+#charts button[aria-pressed=true] { background: var(--accent); color: var(--paper) }
+.chart-explanation { font-size: .85rem; color: var(--muted); margin: 0 0 8px }
+.chart-explanation:empty { display:none }
 .chart {
   background: var(--surface);
   color: var(--accent);
@@ -608,28 +623,6 @@ h1 {
   display: block;
   font: 11px monospace;
   color: var(--muted);
-}
-.chart-group {
-  flex: 0 1 146px;
-  min-width: 0;
-}
-.chart-group:has(> .chart-choice[open]) {
-  flex-basis: 100%;
-}
-.chart-choice {
-  margin: 6px 0;
-}
-.chart-choice summary {
-  width: fit-content;
-  cursor: pointer;
-  font-size: .82rem;
-  padding: 5px 2px;
-}
-.chart-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 4px;
 }
 .chart-options .chart {
   width: 112px;

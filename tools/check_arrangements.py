@@ -1,5 +1,7 @@
 """Publish a line-level review queue for suspicious ChordPro conversions."""
 import re
+import hashlib
+import json
 from pathlib import Path
 from urllib.parse import quote
 
@@ -87,15 +89,31 @@ def issues(text):
     return sorted(problems)
 
 
+def review_signature(rows, number, message):
+    # A changed line or its local context makes the finding eligible for review again.
+    context = '\n'.join(rows[max(0, number-3):number+2])
+    return hashlib.sha256((message+'\n'+context).encode()).hexdigest()
+
+
 def main():
     entries = []
+    confirmed = []
+    reviews = json.loads((ROOT/"tools/verified-lines.json").read_text())
     for path in sorted((ROOT/'ChordPro').glob('*.cho')):
-        for number, message in issues(path.read_text()):
+        text = path.read_text()
+        rows = text.splitlines()
+        for number, message in issues(text):
             name = path.stem.replace('[', r'\[').replace(']', r'\]')
             url = 'https://github.com/krystofkomanec/zpevnik-kk/blob/main/'+quote('ChordPro/'+path.name)
-            entries.append(f'- [{name}, line {number}]({url}#L{number}) — {message}')
+            link = f'- [{name}, line {number}]({url}#L{number})'
+            signature = review_signature(rows, number, message)
+            note = reviews.get(path.name, {}).get(signature)
+            if note:
+                confirmed.append(f'{link} — {note}')
+            else:
+                entries.append(f'{link} — {message}')
     lines = ['# Arrangement checks', '', 'Automatically generated review candidates. Check the linked line against the source arrangement.', '', f'Candidate lines: {len(entries)}', '']
-    (ROOT/'ARRANGEMENT-CHECKS.md').write_text('\n'.join(lines+entries)+'\n')
+    (ROOT/'ARRANGEMENT-CHECKS.md').write_text('\n'.join(lines+entries+['', '## Verified against the supplied sheets', '']+confirmed)+'\n')
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ Open the downloaded `index.html` in your browser on a tablet, phone, or computer
 
 ## Playing songs
 
-Search the library by song title or artist. On smaller screens, the menu button opens the library. Expand **Guitar chords** to see six-string chord shapes, including open and muted strings. Open **Other fingerings** for different voicings of the same chord, or **Harmonic variations** for optional changes to try. Suggestions use the displayed key and leave the score as written. Use the song controls to transpose or resize the text. The header lets you switch appearance and language. **English** shows songs with English lyrics, while **Čeština** shows the full collection. Both modes use Czech chord names (H and B).
+Search the library by song title or artist. On smaller screens, the menu button opens the library. Expand **Guitar chords** to see six-string chord shapes, including open and muted strings. Select a chord, then **Other shapes** for the same chord in another position or **Chord variations** for optional changes in harmony. Suggestions use the displayed key and leave the score as written. Use the song controls to transpose or resize the text. The header lets you switch appearance and language. **English** shows songs with English lyrics, while **Čeština** shows the full collection. Both modes use Czech chord names (H and B).
 
 Use **Sort by** to list titles alphabetically, by the original file timestamp preserved in the downloaded ZIP, or by import time in the app. Date sorts show newest first. Missing dates appear last. Songs from the same import are ordered by title. Edits keep the original addition date.
 
@@ -65,7 +65,7 @@ Uploaded PDFs are stored in the repository and inherit its visibility.
 ## Library statistics
 
 <!-- statistics:start -->
-**601 songs** · 1 added · 420 revisions since tracking began.
+**601 songs** · 1 added · 446 revisions since tracking began.
 
 ```mermaid
 pie showData
@@ -79,11 +79,37 @@ The initial 600 arrangements form the baseline. Each subsequent entry records th
 ### Published changes by month
 
 ```text
-2026-11  ████████████████████████  1 added · 420 updated
+2026-11  ████████████████████████  1 added · 446 updated
 ```
 
 | Date | Song | Change | Revision | Contributor |
 |---|---|---|---:|---|
+| 2026-11-27 | twenty one pilots – Heathens | Updated | 3 | krystofkomanec |
+| 2026-11-27 | All Time Low – Dear Maria, Count Me In | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Cage the Elephant – Rubber Ball | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Nirvana – The Man Who Sold The World | Updated | 4 | krystofkomanec |
+| 2026-11-27 | Rybičky 48 – Klasický pomalý song | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Neil Young – Heart Of Gold | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Chinaski – Schody | Updated | 3 | krystofkomanec |
+| 2026-11-27 | The Killers – Exitlude | Updated | 4 | krystofkomanec |
+| 2026-11-27 | Goo Goo Dolls – Iris | Updated | 3 | krystofkomanec |
+| 2026-11-27 | David Stypka – Jericho | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Rybičky 48 – Slibuju že nebudu pít | Updated | 4 | krystofkomanec |
+| 2026-11-27 | Kabát – Na sever | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Anna K. – Nebe | Updated | 4 | krystofkomanec |
+| 2026-11-27 | Vypsaná fixa – Robí Valentýn | Updated | 3 | krystofkomanec |
+| 2026-11-27 | David Stypka – Vrány Taky | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Karel Kryl – Anděl | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Marek Ztracený – Ztrácíš se | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Chinaski – Láska a jiná násilí | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Vladimír Mišík – Jednou | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Ed Sheeran – I See Fire | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Lou Reed – Perfect Day | Updated | 4 | krystofkomanec |
+| 2026-11-27 | Neil Young – Old Man | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Záviš – Čepice | Updated | 5 | krystofkomanec |
+| 2026-11-27 | Richard Müller – Baroko | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Pink Floyd – Wish You Were Here | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Vladimír Mišík – Variace na renesanční téma | Updated | 3 | krystofkomanec |
 | 2026-11-27 | Rangers (Plavci) – Pole s bavlnou | Updated | 2 | krystofkomanec |
 | 2026-11-27 | Elán – Zanedbaný sex (kapo 3) | Updated | 3 | krystofkomanec |
 | 2026-11-27 | Michal Tučný – Snídaně v trávě | Updated | 2 | krystofkomanec |
@@ -508,6 +534,8 @@ The initial 600 arrangements form the baseline. Each subsequent entry records th
 <!-- statistics:end -->
 
 ## Conversion overview
+
+The six remaining sources were visually reviewed. No existing arrangement matched their titles. The image named `pocity.png` identifies **Tomáš Klus – Pocity**. **Hlídač krav** continues on a second page. **Síla starejch vín** is a photograph with capo 1 and the final lines below the edge of the first sheet. **Až uslyším hvízdání** has two chorus endings. **Bláznova ukolébavka** gives the harmony above the first verse and chorus. **LSD** prints chord positions on the opening two lines only. All six await full transcription.
 
 <!-- pending:start -->
 6 source files awaiting conversion.

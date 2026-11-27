@@ -368,34 +368,51 @@ function chartCard(symbol,shape,description){
  if(description)card.appendChild(make('p',description));
  return card;
 }
-function chartChoice(group,label,options){
- var panel=make('details',undefined,'chart-choice');
- panel.appendChild(make('summary',label));
- panel.ontoggle=function(){
-  if(!panel.open || panel.children.length>1)return;
-  var list=make('div',undefined,'chart-options'),choices=options();
-  choices.forEach(function(option){list.appendChild(chartCard(option.symbol,option.shape,option.description))});
-  if(!choices.length)list.appendChild(make('small',t('Další vhodný hmat nenalezen.','No suitable alternative found.')));
-  panel.appendChild(list);
- };
- group.appendChild(panel);
-}
-var chartSymbols=[];
+var chartSymbols=[], selectedChart='', chartMode='basic';
 function showCharts(){
- var box=el('charts');clear(box);
- if(!el('guitar').open)return;
- var scale=likelyScale(chartSymbols);
+ var box=el('charts');
+ clear(box);
+ if(!el('guitar').open || !chartSymbols.length)return;
+ var picker=make('div',undefined,'chart-picker');
+ var modes=make('div',undefined,'chart-modes');
+ var panel=make('div',undefined,'chart-options');
+ box.appendChild(picker);box.appendChild(modes);box.appendChild(panel);
+ if(chartSymbols.indexOf(selectedChart)<0)selectedChart=chartSymbols[0];
+ function draw(){
+  var spec=chordSpec(selectedChart),shape=guitarShape(selectedChart);
+  var modesAvailable=[
+   ['basic',t('Základní hmat','Basic shape')],
+   ['other',t('Další hmaty','Other shapes')],
+   ['variation',t('Obměny akordu','Chord variations')]
+  ].filter(function(mode){
+   return mode[0]==='basic'||(spec&&(mode[0]==='other'||(!spec.slash&&['','maj','m'].includes(spec.quality))));
+  });
+  if(!modesAvailable.some(function(mode){return mode[0]===chartMode}))chartMode='basic';
+  clear(modes);clear(panel);explanation.textContent='';
+  modesAvailable.forEach(function(mode){
+   var b=make('button',mode[1]);b.setAttribute('aria-pressed',String(chartMode===mode[0]));
+   b.onclick=function(){chartMode=mode[0];draw();modes.querySelector('[aria-pressed=true]').focus({preventScroll:true})};
+   modes.appendChild(b);
+  });
+  if(chartMode==='basic'){panel.appendChild(chartCard(selectedChart,shape));return}
+  var other=chartMode==='other';
+  explanation.textContent=other?t('Stejný akord v jiné poloze na hmatníku.','The same chord elsewhere on the fretboard.'):t('Jiný souzvuk k vyzkoušení. Zápis skladby zůstává stejný.','Try a different sound. The written arrangement stays the same.');
+  var options=other?sameChordOptions(selectedChart,spec,shape):harmonicOptions(spec,likelyScale(chartSymbols));
+  options.forEach(function(opt){panel.appendChild(chartCard(opt.symbol,opt.shape,opt.description))});
+  if(!options.length)panel.appendChild(make('small',t('Další vhodný hmat nenalezen.','No suitable alternative found.')));
+ }
+ var explanation=make('p',undefined,'chart-explanation');
+ box.insertBefore(explanation,panel);
  chartSymbols.forEach(function(symbol){
-  var group=make('div',undefined,'chart-group'),shape=guitarShape(symbol),spec=chordSpec(symbol);
-  group.appendChild(chartCard(symbol,shape));
-  if(spec){
-   chartChoice(group,t('Jiné prstoklady','Other fingerings'),function(){return sameChordOptions(symbol,spec,shape)});
-   if(!spec.slash && ['','maj','m'].includes(spec.quality)){
-    chartChoice(group,t('Harmonické obměny','Harmonic variations'),function(){return harmonicOptions(spec,scale)});
-   }
-  }
-  box.appendChild(group);
+  var b=make('button',symbol);
+  b.setAttribute('aria-pressed',String(selectedChart===symbol));
+  b.onclick=function(){
+   picker.querySelector('[aria-pressed=true]').setAttribute('aria-pressed','false');
+   selectedChart=symbol;b.setAttribute('aria-pressed','true');draw();
+  };
+  picker.appendChild(b);
  });
+ draw();
 }
 el('guitar').ontoggle=showCharts;
 
