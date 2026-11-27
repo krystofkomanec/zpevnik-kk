@@ -540,7 +540,7 @@ The initial 600 arrangements form the baseline. Each subsequent entry records th
 The six remaining sources were visually reviewed. No existing arrangement matched their titles. The image named `pocity.png` identifies **Tomáš Klus – Pocity**. **Hlídač krav** continues on a second page. **Síla starejch vín** is a photograph with capo 1 and the final lines below the edge of the first sheet. **Až uslyším hvízdání** has two chorus endings. **Bláznova ukolébavka** gives the harmony above the first verse and chorus. **LSD** prints chord positions on the opening two lines only. All six await full transcription.
 
 <!-- pending:start -->
-6 source files awaiting conversion.
+7 source files awaiting conversion.
 
 <ul>
 <li>Wohnout - LSD.pdf</li>
@@ -549,5 +549,6 @@ The six remaining sources were visually reviewed. No existing arrangement matche
 <li>Poutníci - Až uslyším hvízdání.pdf</li>
 <li>Pavel Dydovič - Bláznova ukolébavka.pdf</li>
 <li>Škwor - Síla starejch vín.pdf</li>
+<li>swing life away  acoustic chords.pdf</li>
 </ul>
 <!-- pending:end -->
