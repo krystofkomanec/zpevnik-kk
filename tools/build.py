@@ -1,6 +1,7 @@
 """Import new inbox PDFs and build the offline library from individual ChordPro files."""
 import hashlib
 import html
+import os
 import json
 import re
 import subprocess
@@ -46,7 +47,37 @@ def song_change(path, revision):
     return dict(revision=revision, author=author, date=date)
 
 
-def update_readme(catalog):
+def activity_report(songs):
+    english = sum(s.get('lyricsLanguage') == 'en' for s in songs)
+    events = [(c,s) for s in songs for c in s.get('changes', [])]
+    added = sum(c['revision'] == 1 for c,s in events)
+    result = [f"**{len(songs)} songs** · {added} added · {len(events)-added} revisions since tracking began.",
+              "", "```mermaid", "pie showData", "    title Library by lyrics language",
+              f'    "English" : {english}', f'    "Other or undetermined" : {len(songs)-english}', "```", "",
+              "The initial 600 arrangements form the baseline. Each subsequent entry records the author and date of the source commit."]
+    if events:
+        months={}
+        for change,_ in events:
+            month=change['date'][:7]
+            counts=months.setdefault(month,[0,0])
+            counts[0 if change['revision']==1 else 1]+=1
+        result+=['', '### Published changes by month', '', '```text']
+        peak=max(sum(counts) for counts in months.values())
+        for month,(adds,updates) in sorted(months.items()):
+            bar='█'*max(1,round(24*(adds+updates)/peak))
+            result.append(f'{month}  {bar}  {adds} added · {updates} updated')
+        result+=['```']
+        result += ["", "| Date | Song | Change | Revision | Contributor |", "|---|---|---|---:|---|"]
+        def cell(value):
+            return html.escape(value).replace('|', '&#124;').replace('\n',' ')
+        for c,s in sorted(events, key=lambda e:e[0]['date'], reverse=True):
+            song=cell(' – '.join(filter(None,[s['artist'],s['title']])))
+            action='Added' if c['revision']==1 else 'Updated'
+            result.append(f"| {c['date'][:10]} | {song} | {action} | {c['revision']} | {cell(c['author'])} |")
+    return '\n'.join(result)
+
+
+def update_readme(catalog,songs):
     path = ROOT/'README.md'
     start, end = '<!-- pending:start -->', '<!-- pending:end -->'
     before, rest = path.read_text().split(start)
@@ -55,7 +86,10 @@ def update_readme(catalog):
     report = f'{len(catalog)} source files awaiting conversion.'
     if items:
         report += '\n\n<ul>\n'+items+'</ul>'
-    path.write_text(before+start+'\n'+report+'\n'+end+after)
+    readme=before+start+'\n'+report+'\n'+end+after
+    prefix, rest=readme.split('<!-- statistics:start -->')
+    _, suffix=rest.split('<!-- statistics:end -->')
+    path.write_text(prefix+'<!-- statistics:start -->\n'+activity_report(songs)+'\n<!-- statistics:end -->'+suffix)
 
 
 def build():
@@ -127,7 +161,7 @@ def build():
             changes.append(song_change(provenance.get(file,path.relative_to(ROOT)), revision))
         song.update(revision=revision,changes=changes)
     songs=list(by_file.values())
-    update_readme(catalog)
+    update_readme(catalog,songs)
     state_path.write_text(json.dumps(state,ensure_ascii=False,sort_keys=True,indent=2)+'\n')
     version=old.get('version',0)+int(old.get('songs')!=songs or bool(old.get('catalog')))
     # Keep the empty catalog field for older offline readers.
@@ -141,7 +175,10 @@ def build():
     head,sep,_=page.read_text().partition('<script>var songs=')
     if not sep:
         raise ValueError('Missing library script in index.html')
-    page.write_text(head+'<script>'+data.replace('<','\\u003c')+'\nvar libraryVersion='+str(version)+';</script><script>'+(ROOT/'cteni.js').read_text()+'</script></html>\n')
+    visibility=os.environ.get('REPOSITORY_PRIVATE','true').lower()
+    if visibility not in ('true','false'):
+        raise ValueError('Invalid repository visibility')
+    page.write_text(head+'<script>'+data.replace('<','\\u003c')+'\nvar libraryVersion='+str(version)+';var privateRepository='+visibility+';</script><script>'+(ROOT/'cteni.js').read_text()+'</script></html>\n')
     print(f'Library {version}: {len(songs)} songs')
 
 

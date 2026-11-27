@@ -30,7 +30,7 @@ function translatePage(){
 el('language').onclick=function(){
  english=!english;save('language',english?'en':'cs');translatePage();
  if(!visible(current)){current=songs.filter(visible)[0];shift=0}
- list();render();refreshUsage();
+ list();render();
 };
 function theme(){document.body.classList.toggle('dark',dark);el('theme').textContent=dark?'☾':'☀';el('theme').setAttribute('aria-pressed',String(dark));save('dark',dark?'1':'0')}
 el('theme').onclick=function(){dark=!dark;theme()};
@@ -38,101 +38,9 @@ el('toggle').onclick=function(){
  var opened=document.body.classList.toggle('browse');el('toggle').setAttribute('aria-expanded',String(opened));
  window.scrollTo(0,0);
 };
-var eventPrefix='zpevnik.open.',temporaryEvents=[],storageAvailable=true;
-function events(){
- var result=temporaryEvents.slice();
- try{
-  for(var i=0;i<localStorage.length;i++){
-   var key=localStorage.key(i);
-   if(key&&key.indexOf(eventPrefix)===0){
-    var record;
-    try{record=JSON.parse(localStorage.getItem(key))}catch(invalid){continue}
-    if(record&&typeof record.name==='string'&&typeof record.time==='number')result.push(record);
-   }
-  }
- }catch(error){storageAvailable=false}
- return result.sort(function(a,b){return b.time-a.time});
-}
-function recordOpen(song,kind){
- var name=kind==='ChordPro'?[song.artist,song.title].filter(Boolean).join(' - '):song.src.split('/').pop();
- var record={name:name,kind:kind,time:Date.now()};
- var key=eventPrefix+record.time+'.'+Math.random().toString(36).slice(2);
- try{localStorage.setItem(key,JSON.stringify(record))}
- catch(error){storageAvailable=false;temporaryEvents.push(record)}
- if(!el('usage-panel').hidden)showUsage();
-}
-function openedAt(timestamp){
- var date=new Date(timestamp);
- function two(value){return ('0'+value).slice(-2)}
- return date.getDate()+'. '+(date.getMonth()+1)+'. '+date.getFullYear()+' · '+two(date.getHours())+':'+two(date.getMinutes());
-}
-function showSongChanges(){
- var records=[],added=0,updated=0,box=el('revision-list');clear(box);
- songs.filter(visible).forEach(function(song){
-  (song.changes||[]).forEach(function(change){
-   records.push({song:song,change:change});
-   if(change.revision===1)added++;else updated++;
-  });
- });
- el('revision-count').textContent=t('Přidáno: ','Added: ')+added+t(' · Úpravy: ',' · Updates: ')+updated;
- if(!records.length)box.appendChild(make('li',t('Od začátku sledování zatím žádné změny.','No changes since tracking began.')));
- records.sort(function(a,b){return Date.parse(b.change.date)-Date.parse(a.change.date) ||
-  b.change.revision-a.change.revision || a.song.title.localeCompare(b.song.title)});
- records.forEach(function(r){
-  var c=r.change,kind=c.revision===1?t('Přidáno','Added'):t('Upraveno','Updated');
-  var item=make('li',[r.song.artist,r.song.title].filter(Boolean).join(' – '));
-  var time=new Date(c.date).toLocaleDateString(english?'en-GB':'cs-CZ',{year:'numeric',month:'short',day:'numeric'});
-  item.appendChild(document.createElement('br'));
-  item.appendChild(make('small',kind+' · v'+c.revision+' · '+time+' · '+c.author));
-  box.appendChild(item);
- });
-}
-function showUsage(){
- showSongChanges();
- var data=events(),counts=Object.create(null),pdfs=el('pdf-log'),rank=el('file-counts');
- if(english){
-  var names=Object.create(null);
-  songs.filter(visible).forEach(function(s){names[[s.artist,s.title].filter(Boolean).join(' - ')]=true});
-  data=data.filter(function(r){return names[r.name]});
- }
- clear(pdfs);clear(rank);
- data.forEach(function(r){
-  var id=r.kind+'|'+r.name;
-  if(!counts[id])counts[id]={record:r,n:0};
-  counts[id].n++;
-  if(r.kind==='PDF'){
-   var item=make('li',r.name),time=make('small',openedAt(r.time));
-   item.appendChild(time);pdfs.appendChild(item);
-  }
- });
- var ids=Object.keys(counts).sort(function(a,b){return counts[b].n-counts[a].n||counts[b].record.time-counts[a].record.time});
- ids.forEach(function(id){
-  var entry=counts[id],item=make('li'),label=make('span',entry.record.name);
-  label.appendChild(make('small',t('Naposledy otevřeno: ','Last opened: ')+openedAt(entry.record.time)));item.appendChild(label);item.appendChild(make('strong',entry.n+'×'));rank.appendChild(item);
- });
- el('usage-total').textContent=t('Celkem otevření: ','Total opens: ')+data.length+t(' · Různých souborů: ',' · Distinct files: ')+ids.length;
- el('no-pdf').hidden=pdfs.children.length>0;el('reset-usage').disabled=!data.length;
- el('storage-warning').hidden=storageAvailable;
-}
-el('usage').onclick=function(){
- var panel=el('usage-panel');panel.hidden=!panel.hidden;
- el('usage').setAttribute('aria-expanded',String(!panel.hidden));
- if(!panel.hidden)showUsage();
-};
-el('reset-usage').onclick=function(){
- if(!window.confirm(t('Vymazat místní historii otevření a počty otevření?','Clear opening history and counts in this browser?')))return;
- try{
-  var keys=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf(eventPrefix)===0)keys.push(k)}
-  keys.forEach(function(k){localStorage.removeItem(k)});
- }catch(error){storageAvailable=false}
- temporaryEvents=[];showUsage();
-};
-function refreshUsage(){if(!el('usage-panel').hidden)showUsage()}
-window.addEventListener('pageshow',refreshUsage);window.addEventListener('storage',refreshUsage);
 function list(){var box=el('list'),q=fold(el('search').value),count=0;clear(box);
  songs.forEach(function(s){if(!visible(s)||fold(s.title+' '+s.artist).indexOf(q)<0)return;var b=make('button',s.title,'item');b.appendChild(make('small',[s.artist].filter(Boolean).join(' · ')));b.setAttribute('aria-current',s===current?'true':'false');b.onclick=function(){openSong(s)};box.appendChild(b);count++});el('count').textContent=count+t(' položek',count===1?' song':' songs');}
-function openSong(s,initial){
- if(!initial)recordOpen(s,'ChordPro');
+function openSong(s){
  current=s;shift=0;document.body.classList.remove('browse');el('toggle').setAttribute('aria-expanded','false');list();render();window.scrollTo(0,0)}
 function note(n,lang){
  var m=/^([A-H])(is|es|s(?!us)|#|b|♭|♯)?$/.exec(n);if(!m)return null;
@@ -328,7 +236,7 @@ function installLibrary(data){
  var selected=current.file;
  useLibrary(data);
  current=songs.filter(function(s){return s.file===selected && visible(s)})[0] || songs.filter(visible)[0] || songs[0];
- list();render();refreshUsage();el('update-fallback').hidden=true;
+ list();render();el('update-fallback').hidden=true;
  updateMessage('Aktualizováno. Skladeb v knihovně: '+songs.length,'Updated. Songs in the library: '+songs.length);
 }
 var sessionToken='',lastWasCheck=true;
@@ -340,6 +248,16 @@ el('check-library').onclick=function(){requestLibrary(true)};
 el('update-library').onclick=function(){requestLibrary(false)};
 function requestLibrary(check){
  lastWasCheck=check;
+ function accessRequired(cs,en){
+  el('update-fallback').hidden=false;
+  el('private-access').open=true;
+  updateMessage(cs,en);
+ }
+ if(privateRepository && !sessionToken){
+  accessRequired('Pro kontrolu soukromé knihovny zadej token s přístupem pro čtení, nebo stáhni a načti library.json.',
+   'To check this private library, enter a read-only token or download and load library.json.');
+  return;
+ }
  function busy(value){
   el('check-library').disabled=value;el('update-library').disabled=value;el('private-update').disabled=value;
  }
@@ -354,6 +272,12 @@ function requestLibrary(check){
  }
  request.onload=function(){
   busy(false);
+  if(sessionToken && [401,403,404].indexOf(request.status)>=0){
+   sessionToken='';
+   accessRequired('GitHub přístup odmítl. Ověř, že token má pro tento repozitář oprávnění Contents: Read.',
+    'GitHub denied access. Check that the token has Contents: Read for this repository.');
+   return;
+  }
   if(request.status!==200){failed();return}
   try{
    var data=JSON.parse(request.responseText);
@@ -384,5 +308,5 @@ el('update-file').onchange=function(){
  reader.onerror=failed;reader.readAsText(file);input.value='';
 };
 
-translatePage();theme();openSong(songs.filter(function(s){return s.title==='Runaway'})[0],true);
+translatePage();theme();openSong(songs.filter(function(s){return s.title==='Runaway'})[0]);
 })();

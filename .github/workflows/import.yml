@@ -21,6 +21,8 @@ jobs:
       - name: Install PDF and OCR tools
         run: sudo apt-get update -qq && sudo apt-get install -y poppler-utils tesseract-ocr-eng tesseract-ocr-ces
       - name: Build songbook
+        env:
+          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
         run: python3 tools/build.py
       - name: Save converted songs
         run: |

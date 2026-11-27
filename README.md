@@ -21,9 +21,20 @@ Open **Library tools** and select **Check for updates** while online. The check 
 Uploaded PDFs are stored in the repository and inherit its visibility.
 
 
-## Song revisions
+## Library statistics
 
-Under **History and statistics**, the library activity shows additions and updates with the song revision, source commit author and date. The initial 600 arrangements start at revision 1. Tracking begins with the next published change. A PDF import uses the author of the PDF commit. Opening statistics remain local to each browser.
+<!-- statistics:start -->
+**600 songs** · 0 added · 0 revisions since tracking began.
+
+```mermaid
+pie showData
+    title Library by lyrics language
+    "English" : 137
+    "Other or undetermined" : 463
+```
+
+The initial 600 arrangements form the baseline. Each subsequent entry records the author and date of the source commit.
+<!-- statistics:end -->
 
 ## Conversion overview
 
