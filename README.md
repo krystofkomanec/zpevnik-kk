@@ -24,7 +24,7 @@ Uploaded PDFs are stored in the repository and inherit its visibility.
 ## Library statistics
 
 <!-- statistics:start -->
-**600 songs** · 0 added · 0 revisions since tracking began.
+**600 songs** · 0 added · 1 revisions since tracking began.
 
 ```mermaid
 pie showData
@@ -34,6 +34,16 @@ pie showData
 ```
 
 The initial 600 arrangements form the baseline. Each subsequent entry records the author and date of the source commit.
+
+### Published changes by month
+
+```text
+2026-11  ████████████████████████  0 added · 1 updated
+```
+
+| Date | Song | Change | Revision | Contributor |
+|---|---|---|---:|---|
+| 2026-11-27 | Tradiční – Bella Ciao | Updated | 2 | krystofkomanec |
 <!-- statistics:end -->
 
 ## Conversion overview
