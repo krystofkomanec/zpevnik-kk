@@ -30,7 +30,7 @@ Uploaded PDFs are stored in the repository and inherit its visibility.
 ## Library statistics
 
 <!-- statistics:start -->
-**600 songs** · 0 added · 83 revisions since tracking began.
+**600 songs** · 0 added · 84 revisions since tracking began.
 
 ```mermaid
 pie showData
@@ -44,11 +44,12 @@ The initial 600 arrangements form the baseline. Each subsequent entry records th
 ### Published changes by month
 
 ```text
-2026-11  ████████████████████████  0 added · 83 updated
+2026-11  ████████████████████████  0 added · 84 updated
 ```
 
 | Date | Song | Change | Revision | Contributor |
 |---|---|---|---:|---|
+| 2026-11-27 | Oasis – Don’t Look Back in Anger | Updated | 2 | krystofkomanec |
 | 2026-11-27 | Druhá tráva – Sbohem Angelíno | Updated | 2 | krystofkomanec |
 | 2026-11-27 | Kamelot – Fénix | Updated | 2 | krystofkomanec |
 | 2026-11-27 | Čechomor – Tady jsem doma | Updated | 2 | krystofkomanec |
