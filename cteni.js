@@ -96,19 +96,35 @@ function meta(text,key){var lines=text.split(/\r?\n/);for(var k=0;k<lines.length
 function drawLine(line,lang,seen){
  var row=make('div',undefined,line.indexOf('[')<0?'line lyrics-only':'line');
  line=line.trim().replace(/^(\[[^\]]+\])\s+(?=[A-Za-zÀ-ž])/, '$1').replace(/\](?=\[)/g,'] ');
+ var lastMark=null,offset=0;
  line.split(/\s+/).forEach(function(word,i){
+  if(i)offset++;
   if(i)row.appendChild(document.createTextNode(' '));
   var w=make('span',undefined,'word'),rx=/\[([^\]]+)\]([^\[]*)/g,m,first=word.indexOf('[');
   if(first!==0)w.appendChild(document.createTextNode(first<0?word:word.slice(0,first)));
+  if(first>0)offset+=first;
+  if(first<0)offset+=word.length;
   while((m=rx.exec(word))){
    var chunk=make('span',undefined,'chunk'),c=transpose(m[1],lang);
    if(c!=='N.C.'&&seen.indexOf(c)<0)seen.push(c);
+   if(lastMark){
+    var missing=lastMark.width-(offset-lastMark.offset);
+    if(missing>0){
+     var spacer=lastMark.word===w?lastMark.chunk:lastMark.word;
+     spacer.style.paddingRight=missing+'ch';
+    }
+   }
+   lastMark={offset:offset,width:c.length*.96+.9,chunk:chunk,word:w};
+   offset+=m[2].length;
    var lane=make('span',undefined,'chord-lane');
    lane.appendChild(make('span',c,'ch'));chunk.appendChild(lane);
    chunk.appendChild(document.createTextNode(m[2]||'\u200b'));w.appendChild(chunk);
   }
   row.appendChild(w);
  });
+ if(lastMark && offset-lastMark.offset<lastMark.width){
+  lastMark.word.style.paddingRight=(lastMark.width-offset+lastMark.offset)+'ch';
+ }
  return row;
 }
 // Frets run from the low E string to the high E string. -1 mutes a string.
@@ -206,10 +222,16 @@ function render(){var s=current,score=el('score'),ch=[];clear(score);el('title')
  el('harp').textContent=harp?t('Foukací harmonika · ','Harmonica · ')+harp+t(' dur (4. poloha)',' major (4th position)'):'';
  el('harp').hidden=!harp;
  if(s.cho){var c=meta(s.cho,'capo');if(/^\d+$/.test(c)&&+c>0)el('cap').textContent=t('Kapodastr · '+c+'. pražec','Capo · fret '+c);
- var rows=s.cho.split(/\r?\n/), verseLabel=false,sectionName='';
+ var rows=s.cho.split(/\r?\n/), verseLabel=false,sectionName='',tab=null;
  rows.forEach(function(line,i){
-  if(!line.trim()||/^\s*#/.test(line))return;
   var d=directive(line);
+  if(d && /^(start_of_tab|sot)$/.test(d[1])){
+   var details=make('details');details.appendChild(make('summary',t('Tabulatura','Guitar tab')));
+   tab=make('pre');tab.style.overflowX='auto';details.appendChild(tab);score.appendChild(details);return;
+  }
+  if(d && /^(end_of_tab|eot)$/.test(d[1])){tab=null;return}
+  if(tab){tab.appendChild(document.createTextNode(line+'\n'));return}
+  if(!line.trim()||/^\s*#/.test(line))return;
   if(d){
    var lbl={start_of_chorus:'Refrén',soc:'Refrén',start_of_verse:'Sloka',sov:'Sloka',start_of_bridge:'Mezihra'};
    if(d[1]==='comment'||d[1]==='c'||lbl[d[1]]){

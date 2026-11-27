@@ -1,52 +1,113 @@
 {title: I See Fire}
 {artist: Ed Sheeran}
 
+{comment: Intro}
+[N.C.]Oh, misty eye of the mountain below
+Keep careful watch of my brothers' souls
+And should the sky be filled with fire
+and smoke
+Keep watching over Durin's [Em]sons
+
+{comment: Intro Tab}
+{start_of_tab}
+e|---------------------------x-----------
+B|-------------0h1-----------x------3---3
+{end_of_tab}
+G|2h4p20---0---0-------------x------0h2-2
+{start_of_tab}
+D|------0h2----0h2-----------x------0----
+A|-------------3-------------x-----------
+E|0--------------------------------------
+-----x---------------x--|
+-----x---0-----------x--|
+-----x---0-----------x--|
+-----x---2-----------x--|
+-----x---------------x--|
+-----x---0-----------x--| x2
+{end_of_tab}
+
 {comment: Verse 1}
-Em G will
-If this is to end in fire Am7 G/B
-D C Watch the flames burn auburn on the
-Then we should all burn together C
-Em G D mountain side
-Watch the flames climb high into the Am7 G/B C
-Am7 Desolation comes upon the sky
-night
-Em G D C [Chorus]
-Calling out father, oh, stand by and we Em C D Em
-Now I see [Em]fire[C], [D]inside the [Em]mountain
-will Em C D Em
-Am7 G/B I see fire, burning the trees
-Watch the flames burn auburn on the Em C D Em
-C And I see fire, hollowing souls
-mountain side Em C D Am7
-I see [Em]fire[C], [D]blood in the [Am7]breeze
-
-And I hope that you'll remember [Am7]me
-
-[Instrumental] Em C D Em
-I see [Em]fire[C], [D]blood in the [Am7]breeze
-I see fire, feel the heat upon my skin
-[Verse 3] Em
-Em G (fire)
-Oh, should my people fall Em C D Em
-D C And I see fire, oooooo (fire)
-Then surely I'll do the same
-Confined in [Em]mountain [G]halls And I see [Em]fire burn [C]auburn on the
-We got too [D]close to the [Am7]flame [D]mountain [Em]side
-Calling [Em]out fat[G]her, oh, [D]hold fast and [C]we
-************************************
+If this is to [Em]end in [G]fire
+Then we should [D]all burn [C]together
+Watch the [Em]flames climb [G]high [D]into the
+[Am7]night
+Calling [Em]out fa[G]ther, oh, [D]stand by and [C]we
 will
-Am7 G/B | x Dead note
-Watch the flames burn auburn on the | h Hammer-on
-C | p Pull-off
-mountain side
-Am7 G/B C ************************************
-Desolation comes upon the sky
+Watch the [Am7]flames burn [G/B]auburn on the
+[C]mountain side
+[G/B]
+
+{comment: Instrumental}
+{start_of_tab}
+e|---------------------------x-----------
+B|---------------------------x-----------
+{end_of_tab}
+G|2h4p20---0---0-------------x------0h2--
+{start_of_tab}
+D|------0h2----0h2-----------x------0----
+A|-------------3-------------x-----------
+E|0--------------------------------------
+-----x---------------x--|
+-----x---0-----------x--|
+-----x---0-----------x--|
+-----x---2-----------x--|
+-----x---------------x--|
+-----x---0-----------x--|
+{end_of_tab}
+
+{comment: Verse 2}
+And if we should [Em]die to[G]night
+Then we should [D]all die [C]together
+Raise a [Em]glass of [G]wine[D] for the [Am7]last time
+Calling [Em]out fa[G]ther, oh, [D]prepare as [C]we
+will
+Watch the [Am7]flames burn [G/B]auburn on the
+[C]mountain side
+Deso[Am7]lation [G/B]comes upon the [C]sky
 
 {comment: Chorus}
-Now I see [Em]fire[C], [D]inside the [Em]mountain
-I see [Em]fire[C], [D]burning the [Em]trees
-And I see [Em]fire[C], [D]hollowing [Em]souls
-I see [Em]fire[C], [D]blood in the [Am7]breeze
+Now I see [Em]fire[C],  [D]inside the [Em]mountain
+I see [Em]fire[C],  [D]burning the [Em]trees
+And I see [Em]fire[C],  [D]hollowing [Em]souls
+I see [Em]fire[C],  [D]blood in the [Am7]breeze
+And I hope that you'll remember me
+
+{comment: Instrumental}
+{start_of_tab}
+e|---------------------------x-----------
+B|---------------------------x-----------
+{end_of_tab}
+G|2h4p20---0---0-------------x----2h4p2p0
+{start_of_tab}
+D|------0h2----0h2-----------x----0------
+A|-------------3-------------x-----------
+E|0--------------------------------------
+------x---------------x--|
+------x---0-----------x--|
+{end_of_tab}
+-0h2--x---0-----------x--|
+{start_of_tab}
+0-----x---2-----------x--|
+------x---------------x--|
+------x---0-----------x--| x2
+{end_of_tab}
+
+{comment: Verse 3}
+Oh, should my [Em]people [G]fall
+Then surely [D]I'll do the [C]same
+Confined in [Em]mountain [G]halls
+We got too [D]close to the [Am7]flame
+Calling [Em]out fat[G]her, oh, [D]hold fast and [C]we
+will
+Watch the [Am7]flames burn [G/B]auburn on the
+[C]mountain side
+Deso[Am7]lation [G/B]comes upon the [C]sky
+
+{comment: Chorus}
+Now I see [Em]fire[C],  [D]inside the [Em]mountain
+I see [Em]fire[C],  [D]burning the [Em]trees
+And I see [Em]fire[C],  [D]hollowing [Em]souls
+I see [Em]fire[C],  [D]blood in the [Am7]breeze
 And I hope that you'll remember [Am7]me
 
 {comment: Bridge}
@@ -60,8 +121,14 @@ And with that [Am7]shadow upon the ground
 I [G/B]hear my [C]people screaming [D]out
 
 {comment: Chorus}
-Now I see [Em]fire[C], [D]inside the [Em]mountain
-I see [Em]fire[C], [D]burning the [Em]trees
-And I see [Em]fire[C], [D]hollowing [Em]souls
-I see [Em]fire[C], [D]blood in the [Am7]breeze
-And I hope that you'll remember [Am7]me
+Now I see [Em]fire[C],  [D]inside the [Em]mountain
+I see [Em]fire[C],  [D]burning the [Em]trees
+And I see [Em]fire[C],  [D]hollowing [Em]souls
+I see [Em]fire[C],  [D]blood in the [Em]breeze
+I see [Em]fire, oh you [C]know I saw a city
+[D]burning ([Em]fire)
+I see [Em]fire, feel [C]the heat upon my [D]skin
+([Em]fire)
+And I see [Em]fire,[C] oooooo [D](fi[Em]re)
+And I see [Em]fire burn [C]auburn on the
+[D]mountain [Em]side

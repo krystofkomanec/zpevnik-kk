@@ -13,7 +13,14 @@ def issues(text):
     problems = []
     sections = []
     verse = None
+    in_tab = False
     for number, row in enumerate(rows, 1):
+        if row.strip() in ('{start_of_tab}', '{sot}'):
+            in_tab = True
+        if row.strip() in ('{end_of_tab}', '{eot}'):
+            in_tab = False
+        if in_tab:
+            continue
         if row.startswith('{'):
             if VERSE.match(row):
                 verse = []
@@ -27,6 +34,12 @@ def issues(text):
             problems.append((number, 'Four or more chords before the first lyric word'))
         if re.fullmatch(r'\s*\d\s+[A-H](?:m|mi|7|#|b)?\s*', row):
             problems.append((number, 'Possible OCR substitution in chord line'))
+        if re.match(r'^\s*(?:p?age)\s+\d+\s*/\s*\d+\s*$', row, re.I):
+            problems.append((number, 'Page footer in lyrics'))
+        if re.fullmatch(r'\s*=\s*\d+\.?\s*', row):
+            problems.append((number, 'Unexpanded verse reference'))
+        if re.search(r'\w {2,}\w', TAG.sub('', row)):
+            problems.append((number, 'Repeated spaces between lyric characters'))
         if verse is not None:
             verse.append((number, row))
     if not sections:
