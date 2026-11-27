@@ -36,7 +36,7 @@ Uploaded PDFs are stored in the repository and inherit its visibility.
 ## Library statistics
 
 <!-- statistics:start -->
-**601 songs** · 1 added · 259 revisions since tracking began.
+**601 songs** · 1 added · 260 revisions since tracking began.
 
 ```mermaid
 pie showData
@@ -50,11 +50,12 @@ The initial 600 arrangements form the baseline. Each subsequent entry records th
 ### Published changes by month
 
 ```text
-2026-11  ████████████████████████  1 added · 259 updated
+2026-11  ████████████████████████  1 added · 260 updated
 ```
 
 | Date | Song | Change | Revision | Contributor |
 |---|---|---|---:|---|
+| 2026-11-27 | Elvis Presley – Can’t Help Falling in Love | Updated | 2 | krystofkomanec |
 | 2026-11-27 | twenty one pilots – Drag Path | Updated | 2 | krystofkomanec |
 | 2026-11-27 | Cage the Elephant – Come A Little Closer | Updated | 2 | krystofkomanec |
 | 2026-11-27 | Bill Withers – Ain’t No Sunshine | Updated | 2 | krystofkomanec |
