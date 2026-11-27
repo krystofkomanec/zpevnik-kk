@@ -218,10 +218,12 @@ function songLabel(value){
 }
 function render(){var s=current,score=el('score'),ch=[];clear(score);el('title').textContent=s.title;el('artist').textContent=s.artist;el('status').textContent=songLabel(s.note)||'';el('chords').textContent='';el('cap').textContent='';el('tools').style.display=s.cho?'flex':'none';score.style.fontSize=size+'px';
  var harmonicas=['C','','D','','E','F','','G','','A','','H'];
- var harp=typeof s.minor==='number'?harmonicas[(s.minor+shift+15)%12]:'';
+ var sourceCapo=Number(meta(s.cho||'','capo'))||0;
+ var capo=capoSetting(sourceCapo);
+ var harp=typeof s.minor==='number'?harmonicas[(s.minor+shift+capo-sourceCapo+27)%12]:'';
  el('harp').textContent=harp?t('Foukací harmonika · ','Harmonica · ')+harp+t(' dur (4. poloha)',' major (4th position)'):'';
  el('harp').hidden=!harp;
- if(s.cho){var c=meta(s.cho,'capo');if(/^\d+$/.test(c)&&+c>0)el('cap').textContent=t('Kapodastr · '+c+'. pražec','Capo · fret '+c);
+ if(s.cho){if(capo>0)el('cap').textContent=t('Kapodastr · '+capo+'. pražec','Capo · fret '+capo);
  var rows=s.cho.split(/\r?\n/), verseLabel=false,sectionName='',tab=null;
  rows.forEach(function(line,i){
   var d=directive(line);
@@ -257,6 +259,28 @@ function render(){var s=current,score=el('score'),ch=[];clear(score);el('title')
  });
  groupStanzas(score);markReports(score);pitchState();chartSymbols=ch;el('guitar').hidden=!ch.length;el('chords').textContent=ch.join(' · ');showCharts();el('pitch').textContent=(shift>0?'+':'')+shift;el('small').disabled=size<=14;el('big').disabled=size>=40;el('down').disabled=shift<=-12;el('up').disabled=shift>=12}
 }
+function capoSetting(original){
+ var select=el('capo-fret'),stored=get('capo.'+current.file,'');
+ clear(select);
+ function option(value,label){
+  var item=make('option',label);item.value=value;select.appendChild(item);
+ }
+ option('',t('Dle předlohy','As written')+' ('+original+')');
+ option('0',t('Bez kapodastru','No capo'));
+ for(var fret=1;fret<=12;fret++)option(String(fret),String(fret));
+ select.value=/^(?:[0-9]|1[0-2])$/.test(stored)?stored:'';
+ return select.value===''?original:Number(select.value);
+}
+el('capo-fret').onchange=function(){
+ try{
+  var key='zpevnik.capo.'+current.file;
+  if(this.value==='')localStorage.removeItem(key);
+  else localStorage.setItem(key,this.value);
+  render();
+ }catch(error){
+  render();el('status').textContent=t('Kapodastr se nepodařilo uložit.','Could not save the capo setting.');
+ }
+};
 function storedPitch(){
  var value=get('pitch.'+current.file,null);
  return value!==null && /^-?\d+$/.test(value) && Math.abs(Number(value))<=12?Number(value):null;

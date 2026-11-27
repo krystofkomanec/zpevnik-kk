@@ -49,13 +49,13 @@ article{padding:36px 4.5%}.song-head{padding:0 0 16px}.meta,.dark .meta{font-wei
 .playing .stanza-block{break-inside:avoid-column;-webkit-column-break-inside:avoid}.playing .section{margin:.5em 0 .8em;break-after:avoid}.playing .line{break-inside:avoid}
 .playing .page-edge{display:block;position:fixed;top:52px;bottom:0;width:24px;padding:0;min-height:0;border:0;color:var(--muted);background:transparent;font-size:18px}.page-edge:first-letter{opacity:.7}#prev-page{left:0}#next-page{right:0}
 @media (orientation:landscape) and (min-width:700px){.playing #score{column-count:2}}
-</style>
+#capo-fret{font:inherit;color:var(--ink);background:var(--surface);border:0;border-radius:6px;padding:5px;min-height:32px}</style>
 <header><div class="brand"><button id="toggle" type="button" aria-label="Menu knihovny" data-en-aria-label="Library menu" aria-controls="library" aria-expanded="false"><span class="bars"></span></button><b data-en="KK Songbook">Zpěvník KK</b></div><div><button id="language" type="button"></button> <button id="theme" title="Tmavý režim" data-en-title="Dark mode" aria-label="Tmavý režim" data-en-aria-label="Dark mode" aria-pressed="false">☀</button></div></header>
 <main><aside id="library"><div class="library-title"><h2 data-en="Library">Knihovna</h2><p id="count"></p></div><input type="search" id="search" placeholder="Skladba nebo interpret" data-en-placeholder="Song or artist" aria-label="Hledat" data-en-aria-label="Search"><details id="library-tools"><summary data-en="Library tools">Nástroje knihovny</summary><div class="actions"><button id="export-notes">Export připomínek</button><a href="https://github.com/krystofkomanec/zpevnik-kk/upload/main/inbox" target="_blank" rel="noopener" data-en="Upload a PDF">Nahrát PDF</a><button id="check-library" data-en="Check for updates">Zkontrolovat aktuálnost</button><button id="update-library" hidden data-en="Load latest songs">Nahrát nejnovější data</button>
 <p id="update-status" role="status" hidden></p>
 <div id="update-fallback" hidden><details id="private-access"><summary data-en="Private repository access">Přístup k soukromému repozitáři</summary><label><span data-en="Read-only GitHub token (this session only)">GitHub token pro čtení (jen pro toto otevření)</span> <input id="library-token" type="password" autocomplete="off" spellcheck="false"></label> <button id="private-update" data-en="Load songs">Načíst skladby</button></details><a href="https://github.com/krystofkomanec/zpevnik-kk/releases/latest/download/library.json" target="_blank" rel="noopener" data-en="Download library.json">Stáhnout library.json</a> · <label><span data-en="Load downloaded file">Načíst stažený soubor</span> <input id="update-file" type="file" accept=".json,application/json"></label></div>
 </div></details><div id="list"></div></aside>
-<article><div id="play-bar"><span id="playing-title"></span><button id="exit-play" data-en="Exit play mode">Zavřít hraní</button></div><div class="song-head"><div class="meta" id="artist"></div><h1 id="title"></h1><div class="facts"><div id="cap"></div><div id="harp" hidden></div></div><details id="guitar"><summary class="guitar-summary"><span data-en="Guitar chords">Kytarové hmaty</span><small id="chords"></small></summary><div id="charts"></div></details></div><div id="tools"><button id="play" aria-pressed="false" data-en="Play mode">Režim hraní</button><span class="group"><button id="small" aria-label="Zmenšit text" data-en-aria-label="Decrease text size">A−</button> <button id="big" aria-label="Zvětšit text" data-en-aria-label="Increase text size">A+</button></span><span class="group"><span data-en="Transpose">Transpozice</span> <button id="down" aria-label="O půltón níž" data-en-aria-label="Down one semitone">−</button> <button id="pitch" title="Vrátit původní tóninu" data-en-title="Restore original key">0</button> <button id="up" aria-label="O půltón výš" data-en-aria-label="Up one semitone">+</button></span><button id="save-pitch"></button><small id="saved-pitch"></small></div><button class="page-edge" id="prev-page" aria-label="Předchozí strana" data-en-aria-label="Previous page">‹</button><button class="page-edge" id="next-page" aria-label="Další strana" data-en-aria-label="Next page">›</button><div id="score"></div><p id="status" role="status"></p></article></main>
+<article><div id="play-bar"><span id="playing-title"></span><button id="exit-play" data-en="Exit play mode">Zavřít hraní</button></div><div class="song-head"><div class="meta" id="artist"></div><h1 id="title"></h1><div class="facts"><div id="cap"></div><div id="harp" hidden></div></div><details id="guitar"><summary class="guitar-summary"><span data-en="Guitar chords">Kytarové hmaty</span><small id="chords"></small></summary><div id="charts"></div></details></div><div id="tools"><button id="play" aria-pressed="false" data-en="Play mode">Režim hraní</button><span class="group"><button id="small" aria-label="Zmenšit text" data-en-aria-label="Decrease text size">A−</button> <button id="big" aria-label="Zvětšit text" data-en-aria-label="Increase text size">A+</button></span><span class="group"><span data-en="Transpose">Transpozice</span> <button id="down" aria-label="O půltón níž" data-en-aria-label="Down one semitone">−</button> <button id="pitch" title="Vrátit původní tóninu" data-en-title="Restore original key">0</button> <button id="up" aria-label="O půltón výš" data-en-aria-label="Up one semitone">+</button></span><label class="group"><span data-en="Capo">Kapodastr</span><select id="capo-fret"></select></label><button id="save-pitch"></button><small id="saved-pitch"></small></div><button class="page-edge" id="prev-page" aria-label="Předchozí strana" data-en-aria-label="Previous page">‹</button><button class="page-edge" id="next-page" aria-label="Další strana" data-en-aria-label="Next page">›</button><div id="score"></div><p id="status" role="status"></p></article></main>
 <div id="report-overlay" hidden><form id="report-form" role="dialog" aria-modal="true" aria-labelledby="report-title">
 <h2 id="report-title" data-en="Report a line">Připomínka k řádku</h2><p id="report-context"></p><p id="report-text"></p>
 <label><span data-en="Issue">Problém</span><select id="report-kind"><option value="missing-chord" data-en="Missing chord">Chybí akord</option><option value="move-chord" data-en="Move a chord">Posunout akord</option><option value="lyrics" data-en="Incorrect lyrics">Chybný text</option></select></label>
@@ -283,10 +283,12 @@ function songLabel(value){
 }
 function render(){var s=current,score=el('score'),ch=[];clear(score);el('title').textContent=s.title;el('artist').textContent=s.artist;el('status').textContent=songLabel(s.note)||'';el('chords').textContent='';el('cap').textContent='';el('tools').style.display=s.cho?'flex':'none';score.style.fontSize=size+'px';
  var harmonicas=['C','','D','','E','F','','G','','A','','H'];
- var harp=typeof s.minor==='number'?harmonicas[(s.minor+shift+15)%12]:'';
+ var sourceCapo=Number(meta(s.cho||'','capo'))||0;
+ var capo=capoSetting(sourceCapo);
+ var harp=typeof s.minor==='number'?harmonicas[(s.minor+shift+capo-sourceCapo+27)%12]:'';
  el('harp').textContent=harp?t('Foukací harmonika · ','Harmonica · ')+harp+t(' dur (4. poloha)',' major (4th position)'):'';
  el('harp').hidden=!harp;
- if(s.cho){var c=meta(s.cho,'capo');if(/^\d+$/.test(c)&&+c>0)el('cap').textContent=t('Kapodastr · '+c+'. pražec','Capo · fret '+c);
+ if(s.cho){if(capo>0)el('cap').textContent=t('Kapodastr · '+capo+'. pražec','Capo · fret '+capo);
  var rows=s.cho.split(/\r?\n/), verseLabel=false,sectionName='',tab=null;
  rows.forEach(function(line,i){
   var d=directive(line);
@@ -322,6 +324,28 @@ function render(){var s=current,score=el('score'),ch=[];clear(score);el('title')
  });
  groupStanzas(score);markReports(score);pitchState();chartSymbols=ch;el('guitar').hidden=!ch.length;el('chords').textContent=ch.join(' · ');showCharts();el('pitch').textContent=(shift>0?'+':'')+shift;el('small').disabled=size<=14;el('big').disabled=size>=40;el('down').disabled=shift<=-12;el('up').disabled=shift>=12}
 }
+function capoSetting(original){
+ var select=el('capo-fret'),stored=get('capo.'+current.file,'');
+ clear(select);
+ function option(value,label){
+  var item=make('option',label);item.value=value;select.appendChild(item);
+ }
+ option('',t('Dle předlohy','As written')+' ('+original+')');
+ option('0',t('Bez kapodastru','No capo'));
+ for(var fret=1;fret<=12;fret++)option(String(fret),String(fret));
+ select.value=/^(?:[0-9]|1[0-2])$/.test(stored)?stored:'';
+ return select.value===''?original:Number(select.value);
+}
+el('capo-fret').onchange=function(){
+ try{
+  var key='zpevnik.capo.'+current.file;
+  if(this.value==='')localStorage.removeItem(key);
+  else localStorage.setItem(key,this.value);
+  render();
+ }catch(error){
+  render();el('status').textContent=t('Kapodastr se nepodařilo uložit.','Could not save the capo setting.');
+ }
+};
 function storedPitch(){
  var value=get('pitch.'+current.file,null);
  return value!==null && /^-?\d+$/.test(value) && Math.abs(Number(value))<=12?Number(value):null;
