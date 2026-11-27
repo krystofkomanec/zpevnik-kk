@@ -135,16 +135,22 @@ test('migrates legacy storage, imports old backups, exports IDs and reloads pers
 
 test('checks and installs newer libraries, keeps offline cache, and honors both language modes', async ({page}) => {
   const errors = await openOffline(page);
-  await page.route('https://raw.githubusercontent.com/**', async route => {
+  const privateBuild = await page.evaluate(() => window.privateRepository);
+  const endpoint = privateBuild ? 'https://api.github.com/repos/**' : 'https://raw.githubusercontent.com/**';
+  await page.route(endpoint, async route => {
     const checking = route.request().url().includes('version.json');
     await route.fulfill({json: checking ? {version: 10000} : library([englishSong, czechSong])});
   });
   await page.locator('#library-tools > summary').click();
   await page.locator('#check-library').click();
+  if (privateBuild) {
+    await page.locator('#library-token').fill('offline-test-fixture');
+    await page.locator('#private-update').click();
+  }
   await expect(page.locator('#update-library')).toBeVisible();
   await page.locator('#update-library').click();
   await expect(page.locator('#list .item')).toHaveCount(2);
-  await page.unroute('https://raw.githubusercontent.com/**');
+  await page.unroute(endpoint);
   await page.context().setOffline(true);
   await page.reload();
   await expect(page.locator('#list .item')).toHaveCount(2);
