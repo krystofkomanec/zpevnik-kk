@@ -20,6 +20,10 @@ The [automatic arrangement checks](./ARRANGEMENT-CHECKS.md) run on every publica
 
 Under **Library tools**, choose **Export song settings**. Copy the downloaded JSON file to your other device and choose **Import song settings** there. This works offline. The backup includes saved capo frets and transpositions. Import merges settings per song: values in the file take precedence, and other saved values stay in place.
 
+### Library 10 arrangement review
+
+The browser review opens all 601 arrangements at widths of 360, 768 and 1440 pixels and checks chord collisions and horizontal overflow. Source comparisons and the conversion checker also cover column order, source links, unmarked chord runs, joined words and repeated verses. The review queue above contains unresolved candidates. Positions supplied from a matching verse are editorial estimates. Seven arrangements include expandable instrumental tablature taken from the supplied sheets.
+
 ## Updating your library
 
 Open **Library tools** and select **Check for updates** while online. The check compares your local data version with a small version file. If a newer library is available, select **Load latest songs**. The browser keeps the update for offline use. If direct loading is unavailable, follow the download link shown in the app and select the downloaded `library.json`. To update the app itself, download the latest HTML file above.
@@ -36,7 +40,7 @@ Uploaded PDFs are stored in the repository and inherit its visibility.
 ## Library statistics
 
 <!-- statistics:start -->
-**601 songs** · 1 added · 260 revisions since tracking began.
+**601 songs** · 1 added · 420 revisions since tracking began.
 
 ```mermaid
 pie showData
@@ -50,11 +54,171 @@ The initial 600 arrangements form the baseline. Each subsequent entry records th
 ### Published changes by month
 
 ```text
-2026-11  ████████████████████████  1 added · 260 updated
+2026-11  ████████████████████████  1 added · 420 updated
 ```
 
 | Date | Song | Change | Revision | Contributor |
 |---|---|---|---:|---|
+| 2026-11-27 | Rangers (Plavci) – Pole s bavlnou | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Elán – Zanedbaný sex (kapo 3) | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Michal Tučný – Snídaně v trávě | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Poutníci – Zdálo se mně, zdálo | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Olympic – Slzy tvý mámy | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Cop – Pár minut | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Karel Plíhal – Když jsi smutná | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Vlasta Redl – Husličky | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Jaromír Nohavica – Dokud se zpívá | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Cage the Elephant – Come A Little Closer | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Stereophonics – Maybe Tomorrow | Updated | 2 | krystofkomanec |
+| 2026-11-27 | John Mayer – Slow Dancing in a Burning Room | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Alex Clare – Too Close | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Glass Animals – Heat Waves | Updated | 3 | krystofkomanec |
+| 2026-11-27 | The Rolling Stones – Wild Horses | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Druhá tráva – Sbohem Angelíno | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Rise Against – Swing Life Away | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Pokáč – Cowboy | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Cigarettes After Sex – K | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Every Avenue – I Can’t Not Love You | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Tradiční – The Bonnie Banks o’ Loch Lomond | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Nothing But Thieves – Sorry | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Steve Earle – The Galway Girl | Updated | 3 | krystofkomanec |
+| 2026-11-27 | TALK – Run Away To Mars | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Cage the Elephant – Rubber Ball | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Ronan Keating – When You Say Nothing at All | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Oasis – Married With Children | Updated | 3 | krystofkomanec |
+| 2026-11-27 | All Time Low – Therapy | Updated | 3 | krystofkomanec |
+| 2026-11-27 | David Stypka – Domů | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Nirvana – The Man Who Sold The World | Updated | 3 | krystofkomanec |
+| 2026-11-27 | The Script – It’s Not Right for You | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Elton John – Your Song | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Sheryl Crow – If It Makes You Happy | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Oasis – Champagne Supernova | Updated | 3 | krystofkomanec |
+| 2026-11-27 | The Killers – Exitlude | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Green Day – Good Riddance (Time of Your Life) | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Čechomor – Tady jsem doma | Updated | 4 | krystofkomanec |
+| 2026-11-27 | Wanastowi Vjecy – Sbírka zvadlejch růží | Updated | 3 | krystofkomanec |
+| 2026-11-27 | David Stypka – Vrány taky (lepší) | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Donots &amp; Frank Turner – So Long | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Wabi Ryvola – Poslední weekend | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Wanastowi Vjecy – Slečna Anna je za vodou | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Gary Jules – Mad World | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Karel Kryl – Morituri te salutant | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Rybičky 48 – Slibuju že nebudu pít | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Brutus – Zdá se mi | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Ivan Mládek – Rychlík jede do Prahy | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Ghost – Life Eternal | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Kabát – Na sever | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Anna K. – Nebe | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Hana Zagorová – Můj čas | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Marta Kubišová – Nechte zvony znít | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Václav Neckář – Andělé strážní | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Kamil Střihavka – Země vzdálená | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Žlutý pes – Modrá je dobrá | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Lufťáci – Nebeskej dostih | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Lufťáci – Neumim platit účty | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Bob Dylan – Blowin’ in the Wind | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Pacifik – Tvůj čas | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Tomáš Klus – Nina | Updated | 3 | krystofkomanec |
+| 2026-11-27 | J. Kalousek, I. Hlas – Jednou mi fotr povídá | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Folk Team – Motýlí hra | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Tomáš Klus – Chybíš mi | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Buty – František (kapo 2) | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Biffy Clyro – Space | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Queen – I Want It All | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Spirituál kvintet – Bim bam | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Ivan Mládek – Ve Špindlerově Mlýně | Updated | 2 | krystofkomanec |
+| 2026-11-27 | UDG – Hvězdář | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Daniel Landa – Touha | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Hana Zagorová – Málokdo ví | Updated | 4 | krystofkomanec |
+| 2026-11-27 | Karel Kryl – Veličenstvo Kat | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Rangers (Plavci) – Poutník s kytarou | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Michal Tučný – Báječná ženská | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Sons Of The East – Come Away | Updated | 2 | krystofkomanec |
+| 2026-11-27 | EARTH (Czech Republic) – Je Mi Fajn | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Maxim Turbulenc (folkové) – Tři citrónky | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Johnny Cash – Hurt | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Billy Boyd – The Last Goodbye | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Ozzy Osbourne – Mama, I’m Coming Home | Updated | 3 | krystofkomanec |
+| 2026-11-27 | The Beatles – Yesterday | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Olympic – Zrcadlo | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Lady Gaga &amp; Bradley Cooper – Shallow | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Žlutý pes – Sametová | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Spirituál kvintet – Kocábka | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Chinaski – Tabáček | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Lou Reed – Perfect Day | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Poutníci – Hotel Hillary | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Žalman – Rána v trávě | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Norah Jones – Sunrise | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Poutníci – Wayfaring stranger | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Druhá tráva – Ještě není tma | Updated | 4 | krystofkomanec |
+| 2026-11-27 | Fleret – Vizovice | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Kamelot – Bella a Sebastián | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Michal Prokop – Bitva o Karlův most | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Čechomor – Gorale | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Druhá tráva – Na Španělských schodech | Updated | 2 | krystofkomanec |
+| 2026-11-27 | John Lennon – Imagine | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Jaromír Nohavica – Lachtani | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Záviš – Čepice | Updated | 4 | krystofkomanec |
+| 2026-11-27 | Poutníci – Napsal jsem jméno svý na zdi | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Richard Müller – Baroko | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Michal Tučný – Modrá z džín | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Záviš – Cukrářská | Updated | 4 | krystofkomanec |
+| 2026-11-27 | Jaromír Nohavica – Grónská písnička | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Táborová klasika – Hledám děvče na neděli | Updated | 3 | krystofkomanec |
+| 2026-11-27 | The Animals – The House of the Rising Sun | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Zdeněk Svěrák, Jaroslav Uhlíř – Statistika | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Samson – Už to nenapravím | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Spirituál kvintet – Za svou pravdou stát | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Jiří Suchý, Jiří Šlitr – Blues na cestu poslední | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Pink Floyd – Wish You Were Here | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Bratři Ryvolové – Sedmnáct dnů | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Bob Dylan – Knockin’ on Heaven’s Door | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Druhá tráva – Letní romance | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Spirituál kvintet – Mlýny | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – A loď pluje | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Cirkus Praha | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Duchové zemřelých | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Dušan | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Dva rychlý vlaky | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Evangelium podle Jarouše | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Historka z podsvětí | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Jdu krajinou | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Kantorovy varhany | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Když si báječnou ženskou vezme idiot | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Krajina v obrazech | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Krasojezdkyně | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Marie! | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Markéto! | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Moji učitelé | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Mraky | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Můj táta a já | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – Orel &amp; panna | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Pět prstů | Updated | 4 | krystofkomanec |
+| 2026-11-27 | Traband – Tak to mám rád | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Trosečník | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Traband – V oku dravce | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Ve zlatém kočáře | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Vetřelec | Updated | 4 | krystofkomanec |
+| 2026-11-27 | Traband – Vraťte mi mou hlavu | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Traband – Žižkovská romance | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Táborová klasika – Hej šup námořníci | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Michal Tučný – Tam u nebeských bran | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Vladimír Mišík – Variace na renesanční téma | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Greenhorns – John Hardy | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Vlasta Redl – Sbohem, galánečko | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Pacifik – Velrybářská výprava | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Karel Kryl – Karavana mraků | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Wabi Daněk – Ročník 47 | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Hoboes – Zvláštní znamení touha | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Jiří Suchý a Jiří Šlitr – Pramínek vlasů | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Buty – Mám jednu ruku dlouhou | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Spirituál kvintet – Doney Gal | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Pacifik – Mississippi blues | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Hop Trop – Podběl | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Spirituál kvintet – Tisíc mil | Updated | 3 | krystofkomanec |
+| 2026-11-27 | Petr Muk – Bonsoir mademoiselle Paris | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Pacifik – Tulácké blues | Updated | 2 | krystofkomanec |
+| 2026-11-27 | Fleret – Zafúkané | Updated | 2 | krystofkomanec |
 | 2026-11-27 | Elvis Presley – Can’t Help Falling in Love | Updated | 2 | krystofkomanec |
 | 2026-11-27 | twenty one pilots – Drag Path | Updated | 2 | krystofkomanec |
 | 2026-11-27 | Cage the Elephant – Come A Little Closer | Updated | 2 | krystofkomanec |
