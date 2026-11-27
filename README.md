@@ -10,7 +10,7 @@ Search the library by song title or artist. On smaller screens, **Back** returns
 
 ## Updating your library
 
-Select **Load latest songs** in the library while online. The browser keeps the update for offline use. If direct loading is unavailable, follow the download link shown in the app and select the downloaded `library.json`. For a private deployment, you can also enter a repository-scoped GitHub token with read-only Contents access under **Private repository access**. The app keeps it in memory until the page is closed or reloaded. To update the app itself, download the latest HTML file above.
+Select **Load latest songs** in the library while online. The browser keeps the update for offline use. If direct loading is unavailable, follow the download link shown in the app and select the downloaded `library.json`. To update the app itself, download the latest HTML file above.
 
 ## Adding a song
 

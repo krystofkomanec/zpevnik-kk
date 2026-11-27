@@ -83,7 +83,7 @@ def convert(path, artist, title):
     if not starts:
         raise ValueError('No chord-over-lyric section found')
     header = ['{title: '+title+'}', '{artist: '+artist+'}']
-    capo = re.search(r'(?im)\b(?:capo|kapodastr)\s*:?\s*(\d+)','\n'.join(joined[:starts[0]]))
+    capo = re.search(r'(?im)\b(?:capo|kapodastr)\s*[:?]?\s*(\d+)','\n'.join(joined[:starts[0]]))
     if capo and 0<int(capo[1])<=12:
         header.append('{capo: '+capo[1]+'}')
     out, pending, pairs = [], [], 0
