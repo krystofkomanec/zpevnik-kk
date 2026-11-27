@@ -2,7 +2,7 @@ name: Publish songbook
 on:
   push:
     branches: [main]
-    paths: ['inbox/**', 'ChordPro/**', 'tools/**', 'cteni.js', 'index.html', '.github/workflows/import.yml']
+    paths: ['inbox/**', 'ChordPro/**', 'tools/**', 'app/**', 'cteni.js', 'index.html', '.github/workflows/import.yml']
   workflow_dispatch:
 permissions:
   contents: write

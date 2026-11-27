@@ -188,13 +188,20 @@ def build():
     data='var songs='+dump(songs)+';\nvar catalog='+dump(catalog)+';'
     library.write_text(data+'\n')
     page=ROOT/'index.html'
-    head,sep,_=page.read_text().partition('<script>var songs=')
-    if not sep:
-        raise ValueError('Missing library script in index.html')
     visibility=os.environ.get('REPOSITORY_PRIVATE','true').lower()
     if visibility not in ('true','false'):
         raise ValueError('Invalid repository visibility')
-    page.write_text(head+'<script>'+data.replace('<','\\u003c')+'\nvar libraryVersion='+str(version)+';var privateRepository='+visibility+';</script><script>'+(ROOT/'cteni.js').read_text()+'</script></html>\n')
+    assets = ROOT / 'app'
+    library_script = (data.replace('<', '\\u003c') + '\nvar libraryVersion=' + str(version)
+                      + ';var privateRepository=' + visibility + ';')
+    parts = {
+        'styles': (assets / 'songbook.css').read_text(),
+        'share_png': base64.b64encode((assets / 'share.png').read_bytes()).decode('ascii'),
+        'library': library_script,
+        'reader': (ROOT / 'cteni.js').read_text(),
+    }
+    template = (assets / 'songbook.html').read_text()
+    page.write_text(re.sub(r'\{\{(\w+)\}\}', lambda match: parts[match[1]], template))
     print(f'Library {version}: {len(songs)} songs')
 
 

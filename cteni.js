@@ -74,26 +74,47 @@ el('toggle').onclick=function(){
  window.scrollTo(0,opened?libraryView.page||0:0);
  rememberLibrary();
 };
-function list(){
- var box=el('list'),q=fold(el('search').value),top=box.scrollTop,count=0;clear(box);
- songs.forEach(function(s){
-  if(!visible(s)||fold(s.title+' '+s.artist).indexOf(q)<0)return;
-  var b=make('button',s.title,'item');b.appendChild(make('small',s.artist||''));
-  if(order.value!=='title'){
-   var stamp=songDate(s),hasTime=stamp.indexOf('T')!==-1;
-   var day=new Date(hasTime?stamp:stamp+'T12:00:00');
-   var locale=t('cs-CZ','en-GB'),label=t('Datum neznámé','Date unknown');
-   if(isFinite(day.getTime())){
-    label=day.toLocaleDateString(locale);
-    if(hasTime)label+=' · '+(order.value==='source'?stamp.slice(11,16):day.toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit',hour12:false}));
-   }
-   b.appendChild(make('small',label));
-  }
-  b.dataset.file=s.file;b.setAttribute('aria-current',s===current?'true':'false');
-  b.onclick=function(){openSong(s,b)};box.appendChild(b);count++;
- });
- box.scrollTop=top;el('count').textContent=count+t(' položek',count===1?' song':' songs');
+function formatLibraryDate(song){
+ var stamp=songDate(song);
+ var hasTime=stamp.indexOf('T')!==-1;
+ var day=new Date(hasTime?stamp:stamp+'T12:00:00');
+ if(!isFinite(day.getTime()))return t('Datum neznámé','Date unknown');
+ var locale=t('cs-CZ','en-GB');
+ var label=day.toLocaleDateString(locale);
+ if(!hasTime)return label;
+ var time=order.value==='source'?stamp.slice(11,16):day.toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit',hour12:false});
+ return label+' · '+time;
 }
+function list(){
+ var box=el('list');
+ var query=fold(el('search').value.trim());
+ var top=box.scrollTop;
+ var rows=document.createDocumentFragment();
+ var count=0;
+ songs.forEach(function(song){
+  if(!visible(song)||fold(song.title+' '+song.artist).indexOf(query)<0)return;
+  var button=make('button',song.title,'item');
+  button.appendChild(make('small',song.artist||''));
+  if(order.value!=='title')button.appendChild(make('small',formatLibraryDate(song)));
+  button.dataset.file=song.file;
+  button.setAttribute('aria-current',String(song===current));
+  button.onclick=function(){openSong(song,button)};
+  rows.appendChild(button);
+  count++;
+ });
+ clear(box);
+ box.appendChild(rows);
+ box.scrollTop=top;
+ var noun=count===1?' skladba':(count>=2&&count<=4?' skladby':' skladeb');
+ el('count').textContent=count+t(noun,count===1?' song':' songs');
+ el('empty-search').hidden=count!==0;
+ el('clear-search').hidden=!query;
+}
+el('clear-search').onclick=function(){
+ el('search').value='';
+ list();
+ el('search').focus();
+};
 function openSong(s,button){
  rememberLibrary();
  current=s;loadSongSettings();

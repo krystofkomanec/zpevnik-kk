@@ -28,6 +28,10 @@ The browser review opens all 601 arrangements at widths of 360, 768 and 1440 pix
 
 Open **Library tools** and select **Check for updates** while online. The check compares your local data version with a small version file. If a newer library is available, select **Load latest songs**. The browser keeps the update for offline use. If direct loading is unavailable, follow the download link shown in the app and select the downloaded `library.json`. To update the app itself, download the latest HTML file above.
 
+## Building the offline app
+
+Edit the layout and styles in `app/` and the reader behavior in `cteni.js`. Run `python3 tools/build.py` from the repository root to embed the interface, share QR code and library in a single `index.html`. Open that file directly to test it offline.
+
 ## Adding a song
 
 1. Open the [PDF inbox](https://github.com/krystofkomanec/zpevnik-kk/upload/main/inbox). Upload one song per PDF, named `Artist - Title.pdf`. Adding files requires repository write access.
