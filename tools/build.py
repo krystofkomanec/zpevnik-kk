@@ -1,5 +1,6 @@
 """Import new inbox PDFs and build the offline library from individual ChordPro files."""
 import hashlib
+import html
 import json
 import re
 import subprocess
@@ -34,11 +35,35 @@ def lyrics_language(chordpro):
     return 'und'
 
 
+def song_change(path, revision):
+    # PDF imports belong to the commit that supplied the PDF, not the publishing bot.
+    info = subprocess.check_output(
+        ['git', 'log', '-1', '--format=%an%x00%aI', '--', str(path)],
+        cwd=ROOT, text=True).strip()
+    if not info:
+        raise ValueError(f'Commit the song source before building its revision history: {path}')
+    author, date = info.split('\0')
+    return dict(revision=revision, author=author, date=date)
+
+
+def update_readme(catalog):
+    path = ROOT/'README.md'
+    start, end = '<!-- pending:start -->', '<!-- pending:end -->'
+    before, rest = path.read_text().split(start)
+    _, after = rest.split(end)
+    items = ''.join('<li>'+html.escape(r['name'])+'</li>\n' for r in catalog)
+    report = f'{len(catalog)} source files awaiting conversion.'
+    if items:
+        report += '\n\n<ul>\n'+items+'</ul>'
+    path.write_text(before+start+'\n'+report+'\n'+end+after)
+
+
 def build():
     library = ROOT/'knihovna.js'
     source, overview = library.read_text().strip().removesuffix(';').split(';\nvar catalog=')
     songs = json.loads(source.removeprefix('var songs='))
-    catalog = [entry for entry in json.loads(overview) if 'inbox' not in entry]
+    catalog = load(ROOT/'tools/pending-sources.json', [])
+    provenance = {}
     state_path = ROOT/'tools/imports.json'
     state = load(state_path, {})
     by_file = {s['file']:s for s in songs}
@@ -71,18 +96,44 @@ def build():
             target.write_text(cho)
             song = dict(title=title,artist=artist,file=file,lang='cz' if czech_notes or language=='cs' else 'en',cho=cho,lyricsLanguage=language)
             by_file[file]=song
+            provenance[file]=key
             state[key]={'sha256':digest,'file':file,'generated':True}
         except (ValueError,subprocess.CalledProcessError) as error:
             print(f'Review required: {key}: {error}')
             catalog.append(dict(name=path.name,title=title,artist=artist,format='PDF',inbox=key,lyricsLanguage=language))
-    for file,song in by_file.items():
-        song['cho']=(ROOT/'ChordPro'/file).read_text().rstrip()+'\n'
-    songs=list(by_file.values())
-    state_path.write_text(json.dumps(state,ensure_ascii=False,sort_keys=True,indent=2)+'\n')
     payload=ROOT/'library.json'
     old=load(payload,{})
-    version=old.get('version',0)+int(old.get('songs')!=songs or old.get('catalog')!=catalog)
+    previous={s['file']:s for s in old.get('songs',[])}
+    for path in sorted((ROOT/'ChordPro').glob('*.cho')):
+        file=unicodedata.normalize('NFC',path.name)
+        if file not in by_file:
+            cho=path.read_text()
+            def directive(field):
+                m=re.search(r'^\{'+field+r':\s*([^}]+)\}',cho,re.M|re.I)
+                return m[1].strip() if m else ''
+            language=lyrics_language(cho)
+            by_file[file]=dict(file=file,title=directive('title') or path.stem,
+                               artist=directive('artist'),lyricsLanguage=language,
+                               lang='cz' if language=='cs' else 'en')
+    for file,song in by_file.items():
+        path=ROOT/'ChordPro'/file
+        song['cho']=path.read_text().rstrip()+'\n'
+        prior=previous.get(file)
+        revision=prior.get('revision',1) if prior else 0
+        changes=list(prior.get('changes',[])) if prior else []
+        fields=('cho','lang','lyricsLanguage','title','artist','minor','kind','note')
+        if not prior or any(prior.get(key)!=song.get(key) for key in fields):
+            revision+=1
+            changes.append(song_change(provenance.get(file,path.relative_to(ROOT)), revision))
+        song.update(revision=revision,changes=changes)
+    songs=list(by_file.values())
+    update_readme(catalog)
+    state_path.write_text(json.dumps(state,ensure_ascii=False,sort_keys=True,indent=2)+'\n')
+    version=old.get('version',0)+int(old.get('songs')!=songs or bool(old.get('catalog')))
+    # Keep the empty catalog field for older offline readers.
+    catalog=[]
     payload.write_text(dump(dict(schema=1,version=version,songs=songs,catalog=catalog))+'\n')
+    (ROOT/'version.json').write_text(dump(dict(version=version,count=len(songs)))+'\n')
     # Escape HTML end tags inside song data before embedding it in a script element.
     data='var songs='+dump(songs)+';\nvar catalog='+dump(catalog)+';'
     library.write_text(data+'\n')
@@ -91,7 +142,7 @@ def build():
     if not sep:
         raise ValueError('Missing library script in index.html')
     page.write_text(head+'<script>'+data.replace('<','\\u003c')+'\nvar libraryVersion='+str(version)+';</script><script>'+(ROOT/'cteni.js').read_text()+'</script></html>\n')
-    print(f'Library {version}: {len(songs)} songs, {len(catalog)} pending sources')
+    print(f'Library {version}: {len(songs)} songs')
 
 
 if __name__=='__main__':

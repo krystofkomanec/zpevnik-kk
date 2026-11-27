@@ -30,7 +30,7 @@ function translatePage(){
 el('language').onclick=function(){
  english=!english;save('language',english?'en':'cs');translatePage();
  if(!visible(current)){current=songs.filter(visible)[0];shift=0}
- list();render();updateOverview();refreshUsage();
+ list();render();refreshUsage();
 };
 function theme(){document.body.classList.toggle('dark',dark);el('theme').textContent=dark?'☾':'☀';el('theme').setAttribute('aria-pressed',String(dark));save('dark',dark?'1':'0')}
 el('theme').onclick=function(){dark=!dark;theme()};
@@ -66,7 +66,29 @@ function openedAt(timestamp){
  function two(value){return ('0'+value).slice(-2)}
  return date.getDate()+'. '+(date.getMonth()+1)+'. '+date.getFullYear()+' · '+two(date.getHours())+':'+two(date.getMinutes());
 }
+function showSongChanges(){
+ var records=[],added=0,updated=0,box=el('revision-list');clear(box);
+ songs.filter(visible).forEach(function(song){
+  (song.changes||[]).forEach(function(change){
+   records.push({song:song,change:change});
+   if(change.revision===1)added++;else updated++;
+  });
+ });
+ el('revision-count').textContent=t('Přidáno: ','Added: ')+added+t(' · Úpravy: ',' · Updates: ')+updated;
+ if(!records.length)box.appendChild(make('li',t('Od začátku sledování zatím žádné změny.','No changes since tracking began.')));
+ records.sort(function(a,b){return Date.parse(b.change.date)-Date.parse(a.change.date) ||
+  b.change.revision-a.change.revision || a.song.title.localeCompare(b.song.title)});
+ records.forEach(function(r){
+  var c=r.change,kind=c.revision===1?t('Přidáno','Added'):t('Upraveno','Updated');
+  var item=make('li',[r.song.artist,r.song.title].filter(Boolean).join(' – '));
+  var time=new Date(c.date).toLocaleDateString(english?'en-GB':'cs-CZ',{year:'numeric',month:'short',day:'numeric'});
+  item.appendChild(document.createElement('br'));
+  item.appendChild(make('small',kind+' · v'+c.revision+' · '+time+' · '+c.author));
+  box.appendChild(item);
+ });
+}
 function showUsage(){
+ showSongChanges();
  var data=events(),counts=Object.create(null),pdfs=el('pdf-log'),rank=el('file-counts');
  if(english){
   var names=Object.create(null);
@@ -98,7 +120,7 @@ el('usage').onclick=function(){
  if(!panel.hidden)showUsage();
 };
 el('reset-usage').onclick=function(){
- if(!window.confirm(t('Vymazat historii otevření i statistiky v tomto prohlížeči?','Clear all opening history and statistics in this browser?')))return;
+ if(!window.confirm(t('Vymazat místní historii otevření a počty otevření?','Clear opening history and counts in this browser?')))return;
  try{
   var keys=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf(eventPrefix)===0)keys.push(k)}
   keys.forEach(function(k){localStorage.removeItem(k)});
@@ -268,19 +290,6 @@ function render(){var s=current,score=el('score'),ch=[];clear(score);el('title')
  chartSymbols=ch;el('guitar').hidden=!ch.length;el('chords').textContent=ch.join(' · ');showCharts();el('pitch').textContent=(shift>0?'+':'')+shift;el('small').disabled=size<=14;el('big').disabled=size>=40;el('down').disabled=shift<=-12;el('up').disabled=shift>=12}
 }
 el('search').oninput=list;
-function updateOverview(){
- var query=fold(el('catalog-search').value),box=el('catalog-list'),count=0;clear(box);
- catalog.forEach(function(r){
-  if(!visible(r))return;
-  if(query&&fold([r.name,r.artist,r.title].join(' ')).indexOf(query)<0)return;
-  var item=make('li');item.appendChild(make('strong',r.name));box.appendChild(item);count++;
- });
- el('catalog-count').textContent=t('Počet skladeb: ','Songs: ')+count;
-}
-el('catalog-toggle').onclick=function(){
- var panel=el('catalog-panel');panel.hidden=!panel.hidden;el('catalog-toggle').setAttribute('aria-expanded',String(!panel.hidden));if(!panel.hidden)updateOverview();
-};
-el('catalog-search').oninput=updateOverview;
 function resize(d){size=Math.max(14,Math.min(40,size+d));save('text',size);render()}
 el('small').onclick=function(){resize(-2)};el('big').onclick=function(){resize(2)};
 el('up').onclick=function(){shift=Math.min(12,shift+1);render()};el('down').onclick=function(){shift=Math.max(-12,shift-1);render()};el('pitch').onclick=function(){shift=0;render()};
@@ -289,7 +298,10 @@ function validateLibrary(data){
  if(!data || data.schema!==1 || typeof data.version!=='number' || data.version<1 ||
     data.version%1!==0 || !Array.isArray(data.songs) || !data.songs.length || !Array.isArray(data.catalog))throw Error('format');
  if(!data.songs.every(function(s){return s && typeof s.title==='string' && typeof s.artist==='string' &&
-    typeof s.file==='string' && typeof s.cho==='string' && s.cho.length>0}) ||
+    typeof s.file==='string' && typeof s.cho==='string' && s.cho.length>0 &&
+    (!s.changes || (Array.isArray(s.changes) && s.changes.every(function(c){
+     return c && typeof c.author==='string' && typeof c.revision==='number' && isFinite(Date.parse(c.date));
+    })))}) ||
     !data.catalog.every(function(r){return r && typeof r.name==='string'}))throw Error('format');
 }
 function useLibrary(data){
@@ -305,6 +317,7 @@ function updateMessage(cs,en){
 }
 function installLibrary(data){
  validateLibrary(data);
+ el('update-library').hidden=true;
  if(data.version<=libraryVersion){
   el('update-fallback').hidden=true;
   updateMessage('Už máš nejnovější dostupná data.','Your library is already up to date.');return;
@@ -315,37 +328,54 @@ function installLibrary(data){
  var selected=current.file;
  useLibrary(data);
  current=songs.filter(function(s){return s.file===selected && visible(s)})[0] || songs.filter(visible)[0] || songs[0];
- list();render();updateOverview();refreshUsage();el('update-fallback').hidden=true;
+ list();render();refreshUsage();el('update-fallback').hidden=true;
  updateMessage('Aktualizováno. Skladeb v knihovně: '+songs.length,'Updated. Songs in the library: '+songs.length);
 }
-var sessionToken='';
+var sessionToken='',lastWasCheck=true;
 el('private-update').onclick=function(){
  sessionToken=el('library-token').value.trim();el('library-token').value='';
- if(sessionToken)el('update-library').click();
+ if(sessionToken)requestLibrary(lastWasCheck);
 };
-el('update-library').onclick=function(){
- var button=this;button.disabled=true;el('private-update').disabled=true;
- updateMessage('Kontroluji nové skladby…','Checking for new songs…');
+el('check-library').onclick=function(){requestLibrary(true)};
+el('update-library').onclick=function(){requestLibrary(false)};
+function requestLibrary(check){
+ lastWasCheck=check;
+ function busy(value){
+  el('check-library').disabled=value;el('update-library').disabled=value;el('private-update').disabled=value;
+ }
+ busy(true);
+ if(check)el('update-library').hidden=true;
+ updateMessage(check?'Kontroluji verzi knihovny…':'Stahuji skladby…',check?'Checking library version…':'Downloading songs…');
  var request=new XMLHttpRequest();
  function failed(){
-  button.disabled=false;el('private-update').disabled=false;el('update-fallback').hidden=false;
-  updateMessage('Knihovna je dál dostupná offline. Pro aktualizaci zkontroluj připojení nebo stáhni a načti soubor níže.',
-   'Your offline library is available. To update, check your connection or download and load the file below.');
+  busy(false);el('update-fallback').hidden=false;
+  updateMessage('Aktuálnost nelze ověřit. Místní verze: '+libraryVersion+'. Zkontroluj připojení nebo otevři možnosti níže.',
+   'Could not verify the latest version. Local version: '+libraryVersion+'. Check your connection or use the options below.');
  }
  request.onload=function(){
-  button.disabled=false;el('private-update').disabled=false;
+  busy(false);
   if(request.status!==200){failed();return}
-  try{installLibrary(JSON.parse(request.responseText))}catch(error){failed()}
+  try{
+   var data=JSON.parse(request.responseText);
+   if(!check){installLibrary(data);return}
+   if(typeof data.version!=='number'||data.version<1||data.version%1!==0)throw Error('version');
+   var newer=data.version>libraryVersion;
+   el('update-library').hidden=!newer;el('update-fallback').hidden=true;
+   var versions=t('Místní verze ','Local version ')+libraryVersion+t(' · GitHub ',' · GitHub ')+data.version;
+   updateMessage((newer?'Je dostupná aktualizace. ':'Data jsou aktuální. ')+versions,
+    (newer?'Update available. ':'Library is up to date. ')+versions);
+  }catch(error){failed()}
  };
  request.onerror=request.ontimeout=failed;
- var url=sessionToken?'https://api.github.com/repos/krystofkomanec/zpevnik-kk/contents/library.json?ref=main&v=':'https://raw.githubusercontent.com/krystofkomanec/zpevnik-kk/main/library.json?v=';
+ var file=check?'version.json':'library.json';
+ var url=sessionToken?'https://api.github.com/repos/krystofkomanec/zpevnik-kk/contents/'+file+'?ref=main&v=':'https://raw.githubusercontent.com/krystofkomanec/zpevnik-kk/main/'+file+'?v=';
  request.open('GET',url+Date.now(),true);
  if(sessionToken){
   request.setRequestHeader('Accept','application/vnd.github.raw+json');
   request.setRequestHeader('Authorization','Bearer '+sessionToken);
  }
  request.timeout=20000;request.send();
-};
+}
 el('update-file').onchange=function(){
  var input=this,file=input.files[0];if(!file)return;
  var reader=new FileReader();
