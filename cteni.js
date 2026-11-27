@@ -147,11 +147,11 @@ function directive(line){return /^\{\s*([^}:]+?)(?:\s*:\s*([^}]*))?\s*\}$/.exec(
 function meta(text,key){var lines=text.split(/\r?\n/);for(var k=0;k<lines.length;k++){var d=directive(lines[k]);if(d&&d[1]===key)return (d[2]||'').trim()}return ''}
 function drawLine(line,lang,seen){
  var row=make('div',undefined,line.indexOf('[')<0?'line lyrics-only':'line');
- line=line.trim().replace(/^(\[[^\]]+\])\s+(?=[A-Za-zÀ-ž])/, '$1').replace(/\](?=\[)/g,'] ');
+ line=line.trim().replace(/^(\[[^\]]+\])\s+(?=[A-Za-zÀ-ž])/, '$1').replace(/\](?=\[(?!\*\d+×\]))/g,'] ');
  line.split(/\s+/).forEach(function(word,i){
   var lastMark=null,offset=0;
   if(i)row.appendChild(document.createTextNode(' '));
-  var w=make('span',undefined,'word'),rx=/\[([^\]]+)\]([^\[]*)/g,m,first=word.indexOf('[');
+  var w=make('span',undefined,'word'),rx=/\[([^\]]+)\](?:\[\*(\d+)×\])?([^\[]*)/g,m,first=word.indexOf('[');
   if(first!==0)w.appendChild(document.createTextNode(first<0?word:word.slice(0,first)));
   if(first>0)offset+=first;
   if(first<0)offset+=word.length;
@@ -164,11 +164,13 @@ function drawLine(line,lang,seen){
      lastMark.chunk.style.paddingRight=missing+'ch';
     }
    }
-   lastMark={offset:offset,width:c.length*.96+.9,chunk:chunk};
-   offset+=m[2].length;
+   lastMark={offset:offset,width:(c.length+(m[2]?m[2].length+1:0))*.96+.9,chunk:chunk};
+   offset+=m[3].length;
    var lane=make('span',undefined,'chord-lane');
-   lane.appendChild(make('span',c,'ch'));chunk.appendChild(lane);
-   chunk.appendChild(document.createTextNode(m[2]||'\u200b'));w.appendChild(chunk);
+   var badge=make('span',c,'ch');
+   if(m[2])badge.appendChild(make('small',' '+m[2]+'×'));
+   lane.appendChild(badge);chunk.appendChild(lane);
+   chunk.appendChild(document.createTextNode(m[3]||'\u200b'));w.appendChild(chunk);
   }
   if(lastMark && offset-lastMark.offset<lastMark.width)w.style.paddingRight=(lastMark.width-offset+lastMark.offset)+'ch';
   if(word.replace(/\[[^\]]+\]/g,'').length>20)w.className+=' long-word';

@@ -88,6 +88,13 @@ def chord_row(words):
             continue
         if word in ('c','Cc'):
             word = 'C'
+        count = re.fullmatch(r'\(([1-9]\d?)\)', word)
+        if count and result:
+            anchor, symbol = result[-1]
+            if '][' in symbol:
+                return []
+            result[-1] = (anchor, symbol + '][*' + count[1] + '×')
+            continue
         if not CHORD.fullmatch(word):
             return []
         result.append((x,word))
@@ -108,6 +115,8 @@ def align(words, chords):
     lyric_length = len(text)
     for x,chord in reversed(chords):
         pos = lyric_length if x >= coords[-1] else min(range(len(coords)),key=lambda i:abs(coords[i]-x))
+        if pos < lyric_length and text[pos] == ' ':
+            pos += 1
         text = text[:pos]+'['+chord+']'+text[pos:]
     return text
 

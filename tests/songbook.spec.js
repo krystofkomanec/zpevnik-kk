@@ -371,3 +371,26 @@ test('auto-scroll yields to touch and stops at the end; the visual beat is indep
   await page.reload();await page.locator('#play').click();await page.locator('#play-controls-toggle').click();
   await expect(speed).toHaveValue('80');await expect(tempo).toHaveValue('120');
 });
+
+test('counted chords in Swing Life Away stay anchored when wrapped and transposed', async ({page}) => {
+  await openOffline(page);
+  await page.locator('#search').fill('Swing Life Away');
+  await page.locator('#list .item').filter({hasText:'Rise Against'}).first().click();
+  await page.setViewportSize({width:360,height:640});
+  const line=page.locator('#score .line').filter({hasText:'Am I loud'}).first();
+  await expect(line.locator('.ch')).toHaveText(['E5','G5','C5 2×']);
+  const chunk=line.locator('.chunk').last();
+  const lyricBox=()=>chunk.evaluate(el=>{
+    const range=document.createRange();
+    range.selectNodeContents(el.lastChild);
+    const word=range.getBoundingClientRect(), badge=el.querySelector('.ch').getBoundingClientRect();
+    return Math.abs(word.left-badge.left)<2 && badge.bottom<=word.top+2;
+  });
+  await expect(chunk).toHaveText('C5 2×up');
+  expect(await lyricBox()).toBe(true);
+  await page.locator('#song-settings-button').click();
+  await page.locator('#up').click();
+  await expect(chunk).toHaveText('C#5 2×up');
+  expect(await lyricBox()).toBe(true);
+  await expect(page.locator('#chords')).not.toContainText('×');
+});

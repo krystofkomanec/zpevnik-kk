@@ -2,7 +2,7 @@
 import unittest
 
 from check_arrangements import issues
-from import_pdf import align, reading_order
+from import_pdf import align, chord_row, reading_order
 
 
 class ConversionTests(unittest.TestCase):
@@ -19,6 +19,12 @@ class ConversionTests(unittest.TestCase):
 
     def test_trailing_chords_keep_their_order(self):
         self.assertEqual(align([(10,30,"word")], [(45,"A"),(60,"G")]), "word[A][G]")
+
+    def test_counted_chords_keep_their_printed_anchors(self):
+        chords = chord_row([(10, 16, "E5"), (40, 46, "C5"), (50, 60, "(2)")])
+        self.assertEqual(align([(10, 30, "one"), (40, 65, "two")], chords),
+                         "[E5]one [C5][*2×]two")
+        self.assertFalse(chord_row([(10, 20, "(2)")]))
 
     def test_source_debris_is_reported_by_line(self):
         self.assertEqual([n for n,_ in issues("text https://example.org/song\nG D Am lyric")], [1, 2])

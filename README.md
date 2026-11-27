@@ -67,7 +67,7 @@ Uploaded PDFs are stored in the repository and inherit its visibility.
 ## Library statistics
 
 <!-- statistics:start -->
-**601 songs** · 1 added · 446 revisions since tracking began.
+**601 songs** · 1 added · 447 revisions since tracking began.
 
 ```mermaid
 pie showData
@@ -81,11 +81,12 @@ The initial 600 arrangements form the baseline. Each subsequent entry records th
 ### Published changes by month
 
 ```text
-2026-11  ████████████████████████  1 added · 446 updated
+2026-11  ████████████████████████  1 added · 447 updated
 ```
 
 | Date | Song | Change | Revision | Contributor |
 |---|---|---|---:|---|
+| 2026-11-27 | Rise Against – Swing Life Away | Updated | 3 | krystofkomanec |
 | 2026-11-27 | twenty one pilots – Heathens | Updated | 3 | krystofkomanec |
 | 2026-11-27 | All Time Low – Dear Maria, Count Me In | Updated | 3 | krystofkomanec |
 | 2026-11-27 | Cage the Elephant – Rubber Ball | Updated | 3 | krystofkomanec |
